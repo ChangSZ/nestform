@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>户型图导入回归</title>
+<style>body{font:13px/1.5 ui-monospace,Menlo,monospace;margin:16px;background:#f6f7f9;color:#1d2433} td,th{padding:3px 8px;border-bottom:1px solid #dde1e7;vertical-align:top;text-align:left} .src{color:#6b7385}</style></head>
+<body>
+<h3>户型图导入回归（开发用）</h3>
+<p>用法：把样图放到 <code>public/_dbg/</code>（<code>npm run dev</code> 后访问 <code>/tools/import-regress.html?f=lj-01,lj-02</code>，不带参数则跑全部 lj-*），
+逐张跑完整流程（识别 → 读文字 → 补隔墙 → 选比例尺 → 生成方案），输出房间名 / 面积。结果同时挂在 <code>window.RESULT</code> 上，便于脚本比对。</p>
+<table id="t"><thead><tr><th>图</th><th>比例尺</th><th>房间（名称 面积 m²）</th><th>读到的标注</th></tr></thead><tbody></tbody></table>
+<script type="module">
+import {analyze, toPlan, typicalDoorPx, labelRooms, findSplits, chooseScale, floorPlates, ocrHints, pairLabels} from '../src/import/build.js';
+import {readLabels} from '../src/import/ocr.js';
+import {pointInPoly} from '../src/import/rooms.js';
+const A = p => Math.abs(p.reduce((a, q, i) => { const r = p[(i + 1) % p.length]; return a + q[0]*r[1] - r[0]*q[1]; }, 0))/2e6;
+const q = new URLSearchParams(location.search).get('f');
+const files = q ? q.split(',') : ['t1', 't2', ...Array.from({length:30}, (_, i) => 'lj-' + String(i + 1).padStart(2, '0'))];
+window.RESULT = {};
+for (const f of files){
+  const im = new Image(); im.src = `/_dbg/${f}.jpg`;
+  try { await im.decode(); } catch(e){ continue; }
+  const k = Math.min(1, 1600/Math.max(im.naturalWidth, im.naturalHeight)), W = Math.round(im.naturalWidth*k), H = Math.round(im.naturalHeight*k);
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.drawImage(im, 0, 0, W, H);
+  const full = g.getImageData(0, 0, W, H), plates = floorPlates(analyze(full).rec);
+  const crops = plates.length ? plates.map((p, i) => { const [x0, y0, x1, y1] = p.bbox, m = Math.max(60, Math.max(x1 - x0, y1 - y0)*.18);
+    const a = Math.max(0, Math.floor(x0 - m)), b = Math.max(0, Math.floor(y0 - m)), cw = Math.min(W, Math.ceil(x1 + m)) - a, ch = Math.min(H, Math.ceil(y1 + m)) - b;
+    const cv = document.createElement('canvas'); cv.width = cw; cv.height = ch; const cg = cv.getContext('2d'); cg.fillStyle = '#fff'; cg.fillRect(0, 0, cw, ch); cg.drawImage(c, a, b, cw, ch, 0, 0, cw, ch);
+    plates.forEach((o, k) => { if (k !== i){ const [p0, p1, p2, p3] = o.bbox; cg.fillRect(p0 - a - 4, p1 - b - 4, p2 - p0 + 8, p3 - p1 + 8); } });
+    return {tag:`${f}#${i + 1}`, img:cg.getImageData(0, 0, cw, ch)}; }) : [{tag:f, img:full}];
+  for (const {tag, img} of crops) try {
+    let an = analyze(img); const m = typicalDoorPx(an.rec), ref = m ? 850/m : 240/an.T;
+    const labels = await readLabels(img, an.rec.wallMask, (x, y) => an.rooms.some(r => pointInPoly([x, y], r.poly)), null, ocrHints(an)) || [];
+    labelRooms(an, labels); const sp = findSplits(an, img); if (sp.length){ an = analyze(img, {splits:sp, splitDoors:sp.doors}); labelRooms(an, labels); }
+    const cs = chooseScale(an, labels, ref), {plan} = toPlan(an, cs.s);
+    const rooms = plan.rooms.map(r => ({name:r.name, area:+A(r.poly).toFixed(1), bay:r.counted === false}));
+    // 打分：图里每个房间名（及配对的面积）落在哪间生成的房间里 —— 名字对得上算 name 命中，面积差 ≤ 15% 算 area 命中
+    const [bx0, by0] = an.rec.bbox, P = pairLabels(labels), score = {names:P.length, nameHit:0, areas:0, areaHit:0};
+    for (const l of P){
+      const pt = [((l.box[0] + l.box[2])/2 - bx0)*cs.s, ((l.box[1] + l.box[3])/2 - by0)*cs.s], r = plan.rooms.find(q => pointInPoly(pt, q.poly));
+      if (r && r.name.startsWith(l.name.replace(/[A-D]$/, ''))) score.nameHit++;
+      if (l.area){ score.areas++; if (r && Math.abs(A(r.poly) - l.area)/l.area <= .15) score.areaHit++; }
+    }
+    const lab = labels.filter(l => l.name || l.area).map(l => (l.name || '') + (l.area ?? '')).join(' ');
+    window.RESULT[tag] = {scale:+cs.s.toFixed(1), src:cs.src, ref:+ref.toFixed(1), rooms, labels:lab, score};
+    document.querySelector('#t tbody').insertAdjacentHTML('beforeend', `<tr><td>${tag}</td><td>${cs.s.toFixed(1)} <span class="src">${cs.src} / 估算 ${ref.toFixed(1)}</span></td><td>${rooms.map(r => `${r.name} ${r.area}`).join('，')}</td><td class="src">${lab}</td></tr>`);
+  } catch(e){ window.RESULT[tag] = {error:String(e.stack || e)}; document.querySelector('#t tbody').insertAdjacentHTML('beforeend', `<tr><td>${tag}</td><td colspan="3" style="color:#c00">${e}</td></tr>`); }
+}
+window.DONE = true;
+</script>
+</body></html>

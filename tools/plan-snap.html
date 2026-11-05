@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>导入结果快照（开发用）</title>
+<style>body{margin:0;background:#fff;font:12px sans-serif}</style></head>
+<body>
+<script type="module">
+// 开发用：/tools/plan-snap.html?f=t2 —— 跑完整导入流程，把生成的方案（墙 / 门窗 / 房间）画出来，与原图并排，便于肉眼核对
+import {analyze, toPlan, typicalDoorPx, labelRooms, findSplits, chooseScale, ocrHints} from '../src/import/build.js';
+import {readLabels} from '../src/import/ocr.js';
+import {pointInPoly} from '../src/import/rooms.js';
+const f = new URLSearchParams(location.search).get('f') || 't2';
+const im = new Image(); im.src = `/_dbg/${f}.jpg`; await im.decode();
+const k = Math.min(1, 1600/Math.max(im.naturalWidth, im.naturalHeight)), W = Math.round(im.naturalWidth*k), H = Math.round(im.naturalHeight*k);
+const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.drawImage(im, 0, 0, W, H);
+const img = g.getImageData(0, 0, W, H);
+let an = analyze(img); const m = typicalDoorPx(an.rec), ref = m ? 850/m : 240/an.T;
+const labels = await readLabels(img, an.rec.wallMask, (x, y) => an.rooms.some(r => pointInPoly([x, y], r.poly)), null, ocrHints(an)) || [];
+labelRooms(an, labels); const sp = findSplits(an, img); if (sp.length){ an = analyze(img, {splits:sp, splitDoors:sp.doors}); labelRooms(an, labels); }
+const cs = chooseScale(an, labels, ref), {plan} = toPlan(an, cs.s);
+const xs = plan.walls.flatMap(w => [w[0], w[2]]), ys = plan.walls.flatMap(w => [w[1], w[3]]);
+const x0 = Math.min(...xs) - 500, y0 = Math.min(...ys) - 500, sc = H/(Math.max(...ys) - y0 + 500);
+const o = document.createElement('canvas'); o.width = Math.ceil((Math.max(...xs) - x0 + 500)*sc); o.height = H; const q = o.getContext('2d');
+const X = v => (v - x0)*sc, Y = v => (v - y0)*sc, A = p => Math.abs(p.reduce((a, u, i) => { const r = p[(i + 1) % p.length]; return a + u[0]*r[1] - r[0]*u[1]; }, 0))/2e6;
+const cols = ['#fbb', '#bfb', '#bbf', '#fbf', '#bff', '#fdb', '#ddd', '#dbf', '#bdf', '#fdf'];
+plan.rooms.forEach((r, i) => { q.fillStyle = r.counted === false ? '#ccc' : cols[i % cols.length]; q.beginPath(); r.poly.forEach((p, j) => j ? q.lineTo(X(p[0]), Y(p[1])) : q.moveTo(X(p[0]), Y(p[1]))); q.fill(); });
+q.fillStyle = '#222'; plan.walls.forEach(w => q.fillRect(X(w[0]), Y(w[1]), (w[2] - w[0])*sc, (w[3] - w[1])*sc));
+q.fillStyle = '#29f'; plan.wins.forEach(w => q.fillRect(X(w[0]), Y(w[1]), (w[2] - w[0])*sc, (w[3] - w[1])*sc));
+q.fillStyle = '#f80'; plan.doors.forEach(d => q.fillRect(X(d.rect[0]), Y(d.rect[1]), (d.rect[2] - d.rect[0])*sc, (d.rect[3] - d.rect[1])*sc));
+q.fillStyle = '#0a0'; (plan.slides || []).forEach(d => q.fillRect(X(d.rect[0]), Y(d.rect[1]), (d.rect[2] - d.rect[0])*sc, (d.rect[3] - d.rect[1])*sc));
+q.fillStyle = '#000'; q.font = 'bold 13px sans-serif'; q.textAlign = 'center';
+plan.rooms.forEach(r => { q.fillText(r.name, X(r.at[0]), Y(r.at[1])); q.fillText(A(r.poly).toFixed(1), X(r.at[0]), Y(r.at[1]) + 15); });
+// ?raw=1：在原图上叠加识别中间结果（房间区域 + 编号、洞口：橙=门 蓝=窗 绿=门洞 紫=浅色墙、深蓝框=补出的隔墙、红框=读到的文字）
+if (new URLSearchParams(location.search).get('raw')){
+  g.globalAlpha = .4; an.rooms.forEach((r, i) => { g.fillStyle = `hsl(${i*67 % 360} 80% 50%)`; g.beginPath(); r.poly.forEach((p, j) => j ? g.lineTo(...p) : g.moveTo(...p)); g.fill(); });
+  g.globalAlpha = 1; g.lineWidth = 2;
+  for (const op of an.rec.openings){ g.strokeStyle = {door:'#f80', window:'#09f', open:'#0c0', wall:'#a0a'}[op.kind]; g.strokeRect(op.rect[0], op.rect[1], op.rect[2] - op.rect[0], op.rect[3] - op.rect[1]); }
+  g.strokeStyle = '#00f'; (an.splits || []).forEach(r => g.strokeRect(r[0], r[1], r[2] - r[0], r[3] - r[1]));
+  g.strokeStyle = '#f00'; g.lineWidth = 1; labels.forEach(l => g.strokeRect(l.box[0], l.box[1], l.box[2] - l.box[0], l.box[3] - l.box[1]));
+  g.fillStyle = '#000'; g.font = 'bold 13px sans-serif'; an.rooms.forEach((r, i) => g.fillText(i + ':' + (r.label?.name || '?'), r.at[0] - 10, r.at[1]));
+}
+document.body.append(c, o);
+window.AN = an; window.LABELS = labels;
+window.PLAN = plan; window.DONE = true;
+</script>
+</body></html>

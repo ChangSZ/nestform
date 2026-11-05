@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.dbg/
+.playwright-mcp/
+# 第三方房源户型图，仅本地测试识别用，不随仓库分发
+test-images/
+out/
+public/ocr/
+public/_dbg/
+temp/

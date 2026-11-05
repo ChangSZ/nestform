@@ -1,0 +1,1514 @@
+{
+  "retrieved": "2026-11-03",
+  "currency": "CNY",
+  "items": [
+    {
+      "key": "cabinet_wardrobe",
+      "category": "cabinet",
+      "name_zh": "定制衣柜（投影面积）",
+      "unit": "m2_projection",
+      "low": 800,
+      "high": 1800,
+      "includes_labor": true,
+      "brands": [
+        "索菲亚",
+        "欧派",
+        "尚品宅配"
+      ],
+      "notes": "品牌门店主流价（颗粒板/康纯板等人造板，含柜体+普通门板+基础五金，通常含送货安装）。E0颗粒板约800-1200，ENF/康纯板约1000-3000（高配上探）。欧派常见约899/㎡，普惠系列活动价499起。抽屉、拉篮、裤架、灯带、玻璃门等通常另计（抽屉约200-400元/个）。投影面积=柜体宽×高，深度超标(>600mm)或超高常加价。多为SEO攻略/百度AI聚合口径，非官方价目表。",
+      "sources": [
+        {
+          "title": "索菲亚全屋定制一平方多少?2025价格明细解析（新浪看点）",
+          "url": "https://k.sina.cn/article_7857141524_1d452771401901v0xi.html",
+          "date": "2026-11-03"
+        },
+        {
+          "title": "全屋定制衣橱多少钱一平方米？揭秘全屋定制计价方式2025（索菲亚官网攻略）",
+          "url": "https://suofeiya.com/gonglue/23764.html",
+          "date": "2025-09-11"
+        },
+        {
+          "title": "欧派衣柜定制多少钱一平方米（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/ugknowledge?id=5172e947fb87898f6d60e9cdd2a1421c",
+          "date": "2026-10-19"
+        },
+        {
+          "title": "索菲亚定制衣柜,多少钱一平方（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/ugknowledge?id=d4117a790d385909d19f7adf15d9fc88",
+          "date": "2026-09-02"
+        },
+        {
+          "title": "2025全屋定制价格解密:一平方米真实成本揭秘（新浪）",
+          "url": "https://k.sina.com.cn/article_7857141524_1d452771401901o962.html",
+          "date": "2026-03-19"
+        }
+      ]
+    },
+    {
+      "key": "cabinet_wardrobe_solid_wood",
+      "category": "cabinet",
+      "name_zh": "定制实木衣柜（投影面积）",
+      "unit": "m2_projection",
+      "low": 2500,
+      "high": 4000,
+      "includes_labor": true,
+      "brands": [
+        "索菲亚"
+      ],
+      "notes": "实木/实木多层高端系列。仅一条来源（索菲亚官网攻略）；另一篇索菲亚攻略称实木定制可达3000-8000。",
+      "sources": [
+        {
+          "title": "索菲亚定制实木衣柜多少钱一平方？材质与费用解析（索菲亚官网攻略）",
+          "url": "https://m.suofeiya.com/gonglue/23820.html",
+          "date": "2025-09-17"
+        },
+        {
+          "title": "2025 市场价格明细（索菲亚官网攻略）",
+          "url": "https://www.suofeiya.com/gonglue/24622.html",
+          "date": "2026-01-05"
+        }
+      ]
+    },
+    {
+      "key": "cabinet_bookcase",
+      "category": "cabinet",
+      "name_zh": "定制书柜（投影面积）",
+      "unit": "m2_projection",
+      "low": 700,
+      "high": 1300,
+      "includes_labor": true,
+      "brands": [
+        "索菲亚",
+        "欧派"
+      ],
+      "notes": "北京市场：普通颗粒板700-1000，ENF颗粒板/多层板900-1300；爱企查聚合称普通颗粒板450-1150、品牌连锁1200+。书柜与衣柜通常同一投影单价体系；带玻璃门另加价（见cabinet_glass_door_premium）。",
+      "sources": [
+        {
+          "title": "探寻有实力的书柜定制厂,防火、环保书柜定制怎么收费（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1880268200624198591&wfr=spider&for=pc",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "书柜定制多少钱一平方（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/ugknowledge?id=b1021d1ed4839f23980d98a1fa6d8ef3",
+          "date": "2026-10-06"
+        }
+      ]
+    },
+    {
+      "key": "cabinet_entry",
+      "category": "cabinet",
+      "name_zh": "定制玄关柜/鞋柜（投影面积）",
+      "unit": "m2_projection",
+      "low": 900,
+      "high": 1500,
+      "includes_labor": true,
+      "brands": [
+        "索菲亚"
+      ],
+      "notes": "颗粒板投影面积900-1500，1.2m宽玄关柜约1080-1800元（该文按约1.2㎡投影算）。另有通用口径800-1500。",
+      "sources": [
+        {
+          "title": "全屋装修定制报价明细表(文字版)（索菲亚官网攻略）",
+          "url": "https://m.suofeiya.com/gonglue/23846.html",
+          "date": "2025-09-24"
+        },
+        {
+          "title": "索菲亚全屋定制一般多少钱一平方?2025最新价格指南（新浪）",
+          "url": "https://k.sina.com.cn/article_7857141524_1d452771401901v0qo.html",
+          "date": "2026-04-10"
+        }
+      ]
+    },
+    {
+      "key": "cabinet_tv_wall",
+      "category": "cabinet",
+      "name_zh": "定制电视柜/电视背景柜（投影面积）",
+      "unit": "m2_projection",
+      "low": 800,
+      "high": 1800,
+      "includes_labor": true,
+      "brands": [
+        "索菲亚"
+      ],
+      "notes": "E0颗粒板800-1200，多层实木板1200-1800；整组电视柜1500-15000元。通用口径投影800-2000。",
+      "sources": [
+        {
+          "title": "电视柜全屋定制费用:影响因素与参考范围（索菲亚官网攻略）",
+          "url": "https://m.suofeiya.com/gonglue/23807.html",
+          "date": "2025-09-17"
+        },
+        {
+          "title": "定制柜计价（搜狐）",
+          "url": "https://news.sohu.com/a/944162820_121249057",
+          "date": "2025-10-15"
+        }
+      ]
+    },
+    {
+      "key": "cabinet_balcony",
+      "category": "cabinet",
+      "name_zh": "定制阳台柜/洗衣机柜（投影面积）",
+      "unit": "m2_projection",
+      "low": 800,
+      "high": 1200,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "来源弱：颗粒板800-1200，实木1500-2200，铝框+钢化玻璃1200-1600（2023加盟平台文章）；索菲亚攻略的全屋通用800-1200。阳台建议防潮板/多层板，或选铝合金/不锈钢柜体。洗衣机/烘干机空位是否计投影面积因商家而异，未找到明确规则。",
+      "sources": [
+        {
+          "title": "阳台柜定制（加盟星/百度招商）",
+          "url": "https://jiameng.baidu.com/content/detail?id=251275925713",
+          "date": "2023-06-23"
+        },
+        {
+          "title": "100平全屋定制柜子大概费用:2025最新预算明细（索菲亚官网攻略）",
+          "url": "https://m.suofeiya.com/gonglue/24403.html",
+          "date": "2025-11-25"
+        }
+      ]
+    },
+    {
+      "key": "cabinet_glass_door_premium",
+      "category": "cabinet",
+      "name_zh": "玻璃门相对普通板门加价",
+      "unit": "m2",
+      "low": 200,
+      "high": 500,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "按门板面积计的加价：玻璃门比板材门贵约200-500元/㎡。齐家网：玻璃柜门定制单价通常500-800元/㎡（门板本身），钢化玻璃+颗粒板约400元/㎡。品牌套餐（欧派19800/20㎡等）明确不含玻璃门。",
+      "sources": [
+        {
+          "title": "从板材到五金全价格解析,教你避开商家套路（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1849482669459217703&wfr=spider&for=pc",
+          "date": "2025-11-22"
+        },
+        {
+          "title": "玻璃柜门定制多少钱一平（齐家网）",
+          "url": "https://zixun.jia.com/article/1165418.html",
+          "date": "2025-07-02"
+        }
+      ]
+    },
+    {
+      "key": "cabinet_install_separate",
+      "category": "cabinet",
+      "name_zh": "定制柜单独安装费（若报价不含）",
+      "unit": "m2_projection",
+      "low": 60,
+      "high": 200,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "多数品牌投影价已含安装；若单独找安装：基础柜体80-120元/㎡，玻璃门/灯带等复杂设计120-200元/㎡；另一来源60-200元/㎡。",
+      "sources": [
+        {
+          "title": "衣柜安装服务的收费标准受哪些因素影响?（新浪）",
+          "url": "https://k.sina.com.cn/article_7879923682_1d5ae17e206801eyog.html",
+          "date": "2026-10"
+        },
+        {
+          "title": "家具安装服务价格 3种计费方式拆解（百度资讯聚合）",
+          "url": "https://www.baidu.com/s?tn=news&wd=%E9%98%B3%E5%8F%B0%E6%9F%9C",
+          "date": "2026-10"
+        }
+      ]
+    },
+    {
+      "key": "kitchen_cabinet_linear",
+      "category": "kitchen",
+      "name_zh": "整体橱柜（地柜+吊柜+石英石台面，延米）",
+      "unit": "linear_m",
+      "low": 1500,
+      "high": 3000,
+      "includes_labor": true,
+      "brands": [
+        "欧派",
+        "索菲亚(司米)",
+        "志邦",
+        "金牌"
+      ],
+      "notes": "‘延米’口径不统一：多数指地柜+台面+吊柜各1米的组合价，也有只算地柜+台面、吊柜另计。参考：地柜1600+吊柜900≈2500/延米（含石英石）；欧派地柜约1155+石英石台面约800+吊柜约1000/米（2024）；索菲亚基础款约1400-2200，高端3000-4200；志邦入门约1880。品牌一般含安装。",
+      "sources": [
+        {
+          "title": "厨房橱柜多少钱一米（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1395854002951300780.html",
+          "date": "2025-08-29"
+        },
+        {
+          "title": "欧派橱柜价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/317201411995162564.html",
+          "date": "2024-10-11"
+        },
+        {
+          "title": "索飞亚橱柜多少钱一米啊（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/ugknowledge?id=cf7598b474cee52e85e72094eff1169a",
+          "date": "2026-09-03"
+        },
+        {
+          "title": "志邦的橱柜一般多少钱一米（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/ugknowledge?id=d92748f3daf4c5be4328fba77271bc45",
+          "date": "2026-09-15"
+        },
+        {
+          "title": "一般家庭厨柜做好要多少钱一米呢（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/ugknowledge?id=997b71bcffed69ce48006be5dd1914b1",
+          "date": "2026-10-26"
+        }
+      ]
+    },
+    {
+      "key": "kitchen_countertop_quartz",
+      "category": "kitchen",
+      "name_zh": "石英石台面（延米，含加工安装）",
+      "unit": "linear_m",
+      "low": 400,
+      "high": 1500,
+      "includes_labor": true,
+      "brands": [
+        "欧派",
+        "赛凯隆"
+      ],
+      "notes": "石材店/工厂直接做约300-750元/米（入门单色200-300）；品牌橱柜内石英石约600-1500元/米；欧派石英石台面报价1099-2380元/延米属高配。注意‘低于400元/㎡的石英石多为假冒’提示。",
+      "sources": [
+        {
+          "title": "石英石价格表2025（百度知道）",
+          "url": "https://zhidao.baidu.com/question/438976185840484852.html",
+          "date": "2025-09-17"
+        },
+        {
+          "title": "厨房石英石台面多少钱一米（百度知道）",
+          "url": "https://zhidao.baidu.com/question/661083025959859925.html",
+          "date": "2025-07-22"
+        },
+        {
+          "title": "欧派石英石橱柜台面大概多少钱（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1703769763736732348.html",
+          "date": "2025-05-06"
+        }
+      ]
+    },
+    {
+      "key": "package_oppein_kitchen_3m",
+      "category": "package",
+      "name_zh": "欧派橱柜基础套餐（3m地柜+3m台面+1.5m吊柜）",
+      "unit": "piece",
+      "low": 9999,
+      "high": 15999,
+      "includes_labor": true,
+      "brands": [
+        "欧派"
+      ],
+      "notes": "上海市场：含百隆五金和石英石台面；全厨房含烟灶水槽20000-40000。单位为‘每套’。",
+      "sources": [
+        {
+          "title": "2025上海橱柜装修报价指南（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323592.html",
+          "date": "2026-10-09"
+        }
+      ]
+    },
+    {
+      "key": "package_sofia_kitchen",
+      "category": "package",
+      "name_zh": "索菲亚橱柜套餐（米兰/经典系列）",
+      "unit": "piece",
+      "low": 12800,
+      "high": 15800,
+      "includes_labor": true,
+      "brands": [
+        "索菲亚"
+      ],
+      "notes": "米兰系列约12800元（3m地柜+1m吊柜+台面），经典系列15800元起。单一来源。单位为‘每套’。",
+      "sources": [
+        {
+          "title": "2025上海橱柜装修报价指南（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323592.html",
+          "date": "2026-10-09"
+        }
+      ]
+    },
+    {
+      "key": "package_sofia_whole_house",
+      "category": "package",
+      "name_zh": "索菲亚整家定制套餐（折算投影单价）",
+      "unit": "m2_projection",
+      "low": 799,
+      "high": 1000,
+      "includes_labor": true,
+      "brands": [
+        "索菲亚"
+      ],
+      "notes": "799元/㎡为2023年9月整家套餐促销（ENF康纯板，限活动）；2025-26常见19800元/22㎡（折算约900元/㎡）、21999元/22㎡康纯板套餐。超出面积、抽屉(约300/个)、进口五金另计。属促销价，非标价。",
+      "sources": [
+        {
+          "title": "惠民到底！品质到底！索菲亚整家定制套餐加码799元/㎡（搜狐）",
+          "url": "https://www.sohu.com/a/720442732_390451",
+          "date": "2023-09-14"
+        },
+        {
+          "title": "索菲亚全屋定制一平方多少?2025价格明细解析（新浪）",
+          "url": "https://k.sina.cn/article_7857141524_1d452771401901v0xi.html",
+          "date": "2026-11-03"
+        },
+        {
+          "title": "2025全屋定制价格解密（新浪）",
+          "url": "https://k.sina.com.cn/article_7857141524_1d452771401901o962.html",
+          "date": "2026-03-19"
+        }
+      ]
+    },
+    {
+      "key": "package_oppein_whole_house",
+      "category": "package",
+      "name_zh": "欧派全屋定制套餐（折算投影单价）",
+      "unit": "m2_projection",
+      "low": 799,
+      "high": 990,
+      "includes_labor": true,
+      "brands": [
+        "欧派"
+      ],
+      "notes": "19800元/20㎡投影面积套餐（折算990元/㎡，含基础柜体与五金，灯带/拉直器/玻璃门另加）；2024年抖音推广799元/㎡投影面积活动。促销价。",
+      "sources": [
+        {
+          "title": "欧派全屋定制怎么算价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1908330299010119540.html",
+          "date": "2025-12-01"
+        },
+        {
+          "title": "欧派这次放大招了！全屋定制，投影面积，每平方799元（抖音）",
+          "url": "https://www.douyin.com/video/7412665084838759715",
+          "date": "2024-09-09"
+        }
+      ]
+    },
+    {
+      "key": "package_boloni_custom",
+      "category": "package",
+      "name_zh": "博洛尼全屋定制基础套餐（折算投影单价）",
+      "unit": "m2_projection",
+      "low": 1500,
+      "high": 1799,
+      "includes_labor": true,
+      "brands": [
+        "博洛尼"
+      ],
+      "notes": "26999元/16㎡（≈1687/㎡）、29999元/20㎡（=1500/㎡），超出部分1799元/㎡；不含功能五金。个性定制系列1988元/㎡起，单独橱柜12800元起。多来源一致，但均为二手转述。",
+      "sources": [
+        {
+          "title": "博洛尼全屋定制套餐价格解析（百度动态）",
+          "url": "https://mbd.baidu.com/newspage/data/dtlandingsuper?nid=dt_5136229451591597239",
+          "date": "2025-08-26"
+        },
+        {
+          "title": "汽车之家问答（博洛尼全屋定制价格表）",
+          "url": "https://www.autohome.com.cn/ask/23757567.html",
+          "date": "2026-03-01"
+        },
+        {
+          "title": "定制全屋家居推荐博洛尼（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1316791596994652819.html",
+          "date": "2026-05-01"
+        }
+      ]
+    },
+    {
+      "key": "package_boloni_renovation",
+      "category": "package",
+      "name_zh": "博洛尼整装套餐（按房屋面积）",
+      "unit": "package_m2",
+      "low": 1588,
+      "high": 2588,
+      "includes_labor": true,
+      "brands": [
+        "博洛尼"
+      ],
+      "notes": "整装参考价1588-2588元/㎡，别墅全案2588元/㎡起；‘整装1988元/㎡起’另见。按建筑面积还是套内面积未能确认（官网套餐页需交互，未获取到数字）。均为二手转述，官方页未取到。",
+      "sources": [
+        {
+          "title": "博洛尼定制装修多少钱一平（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/ugknowledge?id=4387684074931739b993ffedef569c58",
+          "date": "2026-09-30"
+        },
+        {
+          "title": "博洛尼家装价格大概是多少（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/ugknowledge?id=4081976d22271a3a5836a3cf31b672bf",
+          "date": "2026-10-18"
+        },
+        {
+          "title": "博洛尼全屋定制多少钱一平米（百度知道）",
+          "url": "https://zhidao.baidu.com/question/886554436218806492.html",
+          "date": "2025-05-30"
+        }
+      ]
+    },
+    {
+      "key": "package_shangpin",
+      "category": "package",
+      "name_zh": "尚品宅配全屋定制套餐（折算投影单价）",
+      "unit": "m2_projection",
+      "low": 770,
+      "high": 989,
+      "includes_labor": true,
+      "brands": [
+        "尚品宅配"
+      ],
+      "notes": "不同套餐770-989元/㎡。单一来源（百度知道）；2024-25年另有国补/以旧换新叠加优惠活动报道，无单价。",
+      "sources": [
+        {
+          "title": "尚品宅配衣柜多少钱一平米（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1844776251458161020.html",
+          "date": "2025-11-21"
+        }
+      ]
+    },
+    {
+      "key": "floor_laminate",
+      "category": "floor",
+      "name_zh": "强化复合地板",
+      "unit": "m2",
+      "low": 100,
+      "high": 200,
+      "includes_labor": true,
+      "brands": [
+        "圣象",
+        "德尔",
+        "大自然",
+        "菲林格尔",
+        "扬子"
+      ],
+      "notes": "品牌价通常含安装及基础辅料：德尔109包安装送辅料、圣象N0625e 183含安装辅料、生活家179（2026-10）；北京市场8mm 80-150、12mm 120-200；大自然128-278。素板杂牌45-65。",
+      "sources": [
+        {
+          "title": "100–150元/㎡强化地板推荐（知乎专栏）",
+          "url": "https://zhuanlan.zhihu.com/p/2098362872300623460",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "2025北京地板报价指南（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323601.html",
+          "date": "2026-10-16"
+        },
+        {
+          "title": "大自然地板价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/381840114899380564.html",
+          "date": "2025-04-16"
+        }
+      ]
+    },
+    {
+      "key": "floor_engineered_multilayer",
+      "category": "floor",
+      "name_zh": "多层实木复合地板",
+      "unit": "m2",
+      "low": 200,
+      "high": 400,
+      "includes_labor": false,
+      "brands": [
+        "圣象",
+        "大自然",
+        "德尔"
+      ],
+      "notes": "裸板价；标准安装包约20-75元/㎡（含防潮膜、人工），踢脚线另计。北京15mm多层200-350；大自然多层200-400；另一品牌主力200-400。部分门店报价含安装，需确认。",
+      "sources": [
+        {
+          "title": "2025北京地板报价指南（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323601.html",
+          "date": "2026-10-16"
+        },
+        {
+          "title": "大自然地板价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/445007953332599564.html",
+          "date": "2024-10-07"
+        },
+        {
+          "title": "全系列价格表、安装费与全屋铺装预算全解读（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1878403333042028319&wfr=spider&for=pc",
+          "date": "2026-10-07"
+        }
+      ]
+    },
+    {
+      "key": "floor_engineered_3layer",
+      "category": "floor",
+      "name_zh": "三层实木复合地板",
+      "unit": "m2",
+      "low": 280,
+      "high": 450,
+      "includes_labor": false,
+      "brands": [
+        "圣象",
+        "大自然"
+      ],
+      "notes": "北京15mm三层280-450；圣象三层295-418。安装另约20-75元/㎡。",
+      "sources": [
+        {
+          "title": "2025北京地板报价指南（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323601.html",
+          "date": "2026-10-16"
+        },
+        {
+          "title": "复合木地板价格表2025（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1681924356602134987.html",
+          "date": "2025-07-10"
+        }
+      ]
+    },
+    {
+      "key": "floor_solid_wood",
+      "category": "floor",
+      "name_zh": "实木地板",
+      "unit": "m2",
+      "low": 400,
+      "high": 1000,
+      "includes_labor": null,
+      "brands": [
+        "大自然",
+        "圣象",
+        "安信",
+        "久盛"
+      ],
+      "notes": "大自然实木均价300+（槲栎约430、椿木约490）；柚木入门550+、常规700+；土巴兔称纯实木500-2000。安装人工约16-20元/㎡另计或门店包含，口径不一。",
+      "sources": [
+        {
+          "title": "大自然实木地板（百度百科）",
+          "url": "https://baike.baidu.com/item/%E5%A4%A7%E8%87%AA%E7%84%B6%E5%AE%9E%E6%9C%A8%E5%9C%B0%E6%9D%BF/128669",
+          "date": ""
+        },
+        {
+          "title": "全系列价格表、安装费与全屋铺装预算全解读（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1878403333042028319&wfr=spider&for=pc",
+          "date": "2026-10-07"
+        },
+        {
+          "title": "实木地板价格因品类差异（土巴兔）",
+          "url": "https://www.to8to.com/yezhu/z373714.html",
+          "date": "2026-09-17"
+        }
+      ]
+    },
+    {
+      "key": "floor_bamboo",
+      "category": "floor",
+      "name_zh": "竹地板",
+      "unit": "m2",
+      "low": 130,
+      "high": 300,
+      "includes_labor": null,
+      "brands": [],
+      "notes": "来源弱：普通竹木地板130-190（2025）；碳化/品牌150-300（企业AI问答）；百科约280。是否含安装未说明。",
+      "sources": [
+        {
+          "title": "竹木地板多少钱一平米（百度知道）",
+          "url": "https://zhidao.baidu.com/question/373986787237384052.html",
+          "date": "2025-06-17"
+        },
+        {
+          "title": "竹地板价格（百度智能体问答）",
+          "url": "https://agents.baidu.com/content/question/0f399d091a6dc41715bc5ada",
+          "date": ""
+        },
+        {
+          "title": "竹地板（百度百科）",
+          "url": "https://baike.baidu.com/item/%E7%AB%B9%E5%9C%B0%E6%9D%BF/10346113",
+          "date": ""
+        }
+      ]
+    },
+    {
+      "key": "floor_herringbone",
+      "category": "floor",
+      "name_zh": "人字拼/鱼骨拼木地板（材料）",
+      "unit": "m2",
+      "low": 200,
+      "high": 600,
+      "includes_labor": false,
+      "brands": [
+        "圣象",
+        "扬子",
+        "安信",
+        "书香门地"
+      ],
+      "notes": "裸板：扬子人字拼(耐磨纸面)169-199、圣象多层人字拼229、扬子三层368-399、安信黑胡桃549；书香门地栎木鱼骨拼门店1456/渠道1050（高端）。特殊拼法损耗约10-12%。安装费见floor_herringbone_install。",
+      "sources": [
+        {
+          "title": "拼花预算家庭的地板品牌推荐（知乎专栏）",
+          "url": "https://zhuanlan.zhihu.com/p/2096907561563846456",
+          "date": "2026-10-23"
+        },
+        {
+          "title": "人字拼地板品牌盘点（知乎专栏）",
+          "url": "https://zhuanlan.zhihu.com/p/2098305475565692699",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "宁波装修地板攻略|书香门地嘉德绅士003鱼骨拼（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1880302717411803984&wfr=spider&for=pc",
+          "date": "2026-10-28"
+        }
+      ]
+    },
+    {
+      "key": "floor_herringbone_install",
+      "category": "floor",
+      "name_zh": "人字拼/鱼骨拼安装（人工+辅料）",
+      "unit": "m2",
+      "low": 35,
+      "high": 85,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "人字拼人工普遍35-45，鱼骨拼再高5-10（约平铺的2-3倍）；品牌安装包人字拼48（大板28）；书香门地鱼骨安装+辅料85。",
+      "sources": [
+        {
+          "title": "人字拼地板人工费比平铺贵2倍（什么值得买）",
+          "url": "https://post.smzdm.com/p/aomdgn29/",
+          "date": "2026-06-23"
+        },
+        {
+          "title": "人字拼地板品牌盘点（知乎专栏）",
+          "url": "https://zhuanlan.zhihu.com/p/2098305475565692699",
+          "date": "2026-10-26"
+        }
+      ]
+    },
+    {
+      "key": "tile_600x600",
+      "category": "tile",
+      "name_zh": "600×600 地砖（材料）",
+      "unit": "m2",
+      "low": 60,
+      "high": 200,
+      "includes_labor": false,
+      "brands": [
+        "东鹏",
+        "马可波罗",
+        "诺贝尔"
+      ],
+      "notes": "来源弱：东鹏600×600约50-80元/片（≈139-222元/㎡，2024）；宁波玻化砖80-200元/㎡。600规格家装已非主流。",
+      "sources": [
+        {
+          "title": "东鹏瓷砖600x600一片大概多少钱（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1779486751165962060.html",
+          "date": "2024-10-20"
+        },
+        {
+          "title": "2025年宁波瓷砖选购攻略（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z249496.html",
+          "date": "2026-10-19"
+        }
+      ]
+    },
+    {
+      "key": "tile_800x800",
+      "category": "tile",
+      "name_zh": "800×800 地砖（材料）",
+      "unit": "m2",
+      "low": 80,
+      "high": 300,
+      "includes_labor": false,
+      "brands": [
+        "马可波罗",
+        "东鹏",
+        "诺贝尔"
+      ],
+      "notes": "国产一线品牌抛釉砖：徐州75-180；广州80-150；南京马可波罗180-320、东鹏160-280、诺贝尔200-350（偏高端系列）；另一文称常规抛釉45-120。中位建议约120-180。",
+      "sources": [
+        {
+          "title": "徐州各大品牌瓷砖报价（土巴兔）",
+          "url": "https://www.to8to.com/yezhu/z341225.html",
+          "date": "2025-11-13"
+        },
+        {
+          "title": "2025南京瓷砖报价指南:6大品牌价格明细（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323578.html",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "2025广州瓷砖报价指南（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323581.html",
+          "date": "2026-10-19"
+        },
+        {
+          "title": "瓷砖合理价格区间（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1880038918702641120&wfr=spider&for=pc",
+          "date": "2026-10-26"
+        }
+      ]
+    },
+    {
+      "key": "tile_750x1500",
+      "category": "tile",
+      "name_zh": "750×1500 大板砖（材料）",
+      "unit": "m2",
+      "low": 100,
+      "high": 230,
+      "includes_labor": false,
+      "brands": [],
+      "notes": "通铺大板合理区间90-220；另一文105-230；2026终端中位约126元/片（≈112元/㎡）。",
+      "sources": [
+        {
+          "title": "瓷砖合理价格区间（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1880038918702641120&wfr=spider&for=pc",
+          "date": "2026-10-26"
+        },
+        {
+          "title": "瓷砖选800×800还是750×1500（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1880262523111801112&wfr=spider&for=pc",
+          "date": "2026-10-29"
+        },
+        {
+          "title": "750×1500终端价（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1877645262502928512&wfr=spider&for=pc",
+          "date": "2026-09-29"
+        }
+      ]
+    },
+    {
+      "key": "tile_slab_900x1800",
+      "category": "tile",
+      "name_zh": "900×1800 大板/岩板（材料）",
+      "unit": "m2",
+      "low": 150,
+      "high": 500,
+      "includes_labor": false,
+      "brands": [],
+      "notes": "来源弱：厂商AI问答称900×1800釉面200-400、抛光300-500；岩板低端75-300、中端300-1000（2022）。",
+      "sources": [
+        {
+          "title": "900mm*1800mm磁砖的价格表（百度智能体，佛山厂商）",
+          "url": "https://agents.baidu.com/content/question/5fc182eff7fc1f22af17a0a6",
+          "date": ""
+        },
+        {
+          "title": "750×1500价格八十元是真岩板吗（百度问一问）",
+          "url": "https://wen.baidu.com/question/1967472701630064260.html",
+          "date": "2022-05-17"
+        }
+      ]
+    },
+    {
+      "key": "tile_300x300_antislip",
+      "category": "tile",
+      "name_zh": "300×300 防滑地砖（材料）",
+      "unit": "m2",
+      "low": 60,
+      "high": 120,
+      "includes_labor": false,
+      "brands": [
+        "马可波罗",
+        "东鹏"
+      ],
+      "notes": "广州卫生间防滑地砖70-120；徐州马可波罗防滑砖75；通用30-100。",
+      "sources": [
+        {
+          "title": "2025广州瓷砖报价指南（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323581.html",
+          "date": "2026-10-19"
+        },
+        {
+          "title": "徐州各大品牌瓷砖报价（土巴兔）",
+          "url": "https://www.to8to.com/yezhu/z341225.html",
+          "date": "2025-11-13"
+        }
+      ]
+    },
+    {
+      "key": "tile_300x600_wall",
+      "category": "tile",
+      "name_zh": "300×600 墙砖（材料）",
+      "unit": "m2",
+      "low": 50,
+      "high": 130,
+      "includes_labor": false,
+      "brands": [
+        "东鹏"
+      ],
+      "notes": "广州300×600墙砖50-90；东鹏300×600大理石纹墙砖23元/块（≈128元/㎡）。",
+      "sources": [
+        {
+          "title": "2025广州瓷砖报价指南（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z323581.html",
+          "date": "2026-10-19"
+        },
+        {
+          "title": "东鹏白色300*600墙砖报价（安居客/58）",
+          "url": "https://mfang.58.com/wh/news/30/787533.html",
+          "date": "2026-10-28"
+        }
+      ]
+    },
+    {
+      "key": "tile_vintage_encaustic",
+      "category": "tile",
+      "name_zh": "复古花砖（材料）",
+      "unit": "m2",
+      "low": 80,
+      "high": 300,
+      "includes_labor": false,
+      "brands": [],
+      "notes": "来源弱：200×200釉面花砖6-12元/片（25片/㎡≈150-300元/㎡）；仿古砖80-800。",
+      "sources": [
+        {
+          "title": "花砖铺贴落地需要多少钱（汽车之家问答）",
+          "url": "https://www.autohome.com.cn/ask/22765547.html",
+          "date": "2026-01-30"
+        },
+        {
+          "title": "仿古砖价格区间（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1858726790973848388&wfr=spider&for=pc",
+          "date": "2026-03-04"
+        }
+      ]
+    },
+    {
+      "key": "stone_marble_natural",
+      "category": "tile",
+      "name_zh": "天然大理石板（材料，地面/墙面）",
+      "unit": "m2",
+      "low": 300,
+      "high": 800,
+      "includes_labor": false,
+      "brands": [],
+      "notes": "低档国产200-400（芝麻白等），中档400-600（西班牙米黄等），高档600-800（卡拉拉白），定制/稀有更高；安娜米黄毛板400-900（2025）。不含铺贴，见tile_labor_marble。",
+      "sources": [
+        {
+          "title": "贴大理石地板多少钱一个平方（百度知道）",
+          "url": "https://zhidao.baidu.com/question/149595594315413445.html",
+          "date": "2026-03-25"
+        },
+        {
+          "title": "2025年大理石石材价格组成（光明石业）",
+          "url": "http://www.gmcuttingstone.com/index/2556.html",
+          "date": "2024-12-07"
+        },
+        {
+          "title": "安娜米黄（百度百科）",
+          "url": "https://baike.baidu.com/item/%E5%AE%89%E5%A8%9C%E7%B1%B3%E9%BB%84/5807069",
+          "date": ""
+        }
+      ]
+    },
+    {
+      "key": "tile_labor_floor",
+      "category": "tile",
+      "name_zh": "地砖铺贴人工（600/800规格）",
+      "unit": "m2",
+      "low": 35,
+      "high": 65,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "纯人工：800×800约35-50（2026）；常规800地砖40-65；不含辅料（瓷砖胶/砂浆另计约10-20）。一线城市偏高。",
+      "sources": [
+        {
+          "title": "2026单价表按规格和铺法分开算（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1879526701782421625&wfr=spider&for=pc",
+          "date": "2026-10-20"
+        },
+        {
+          "title": "2025年装修人工费全指南（百度文库）",
+          "url": "http://wenku.baidu.com/search?word=%E7%93%B7%E7%A0%96%E9%93%BA%E8%B4%B4+%E4%BA%BA%E5%B7%A5",
+          "date": "2025"
+        },
+        {
+          "title": "厨房装修材料价格表（土巴兔）",
+          "url": "https://m.to8to.com/yezhu/z264411.html",
+          "date": "2026-10-22"
+        }
+      ]
+    },
+    {
+      "key": "tile_labor_wall",
+      "category": "tile",
+      "name_zh": "墙砖铺贴人工（300×600等）",
+      "unit": "m2",
+      "low": 30,
+      "high": 65,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "300×600清工30-60（一线60-90）；300×600约45；厨卫墙砖45-65。",
+      "sources": [
+        {
+          "title": "贴墙砖价格多少一平米工费（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/rankList?query=9c09b00b63a2f0fcbf0274685f806aff&type=20",
+          "date": "2026-07-15"
+        },
+        {
+          "title": "贴墙板瓷砖人工费多少钱一平方米（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1716691232009574780.html",
+          "date": "2025-09-13"
+        },
+        {
+          "title": "2026单价表按规格和铺法分开算（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1879526701782421625&wfr=spider&for=pc",
+          "date": "2026-10-20"
+        }
+      ]
+    },
+    {
+      "key": "tile_labor_large_slab",
+      "category": "tile",
+      "name_zh": "大板铺贴人工（750×1500 / 900×1800）",
+      "unit": "m2",
+      "low": 60,
+      "high": 120,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "750×1500及以上60-100（2026）；750×1500 80-150（一线120-150）；900×1800清包95（2024）。人字拼/鱼骨拼瓷砖铺法80-150。",
+      "sources": [
+        {
+          "title": "2026单价表按规格和铺法分开算（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1879526701782421625&wfr=spider&for=pc",
+          "date": "2026-10-20"
+        },
+        {
+          "title": "750x1500铺贴人工费多少（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1841586918838241489&wfr=spider&for=pc",
+          "date": "2025-08-28"
+        },
+        {
+          "title": "最新地砖铺贴清包报价详解（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1799158070102291634&wfr=spider&for=pc",
+          "date": "2024-05-16"
+        }
+      ]
+    },
+    {
+      "key": "tile_labor_marble",
+      "category": "tile",
+      "name_zh": "大理石铺贴人工（地面湿贴）",
+      "unit": "m2",
+      "low": 60,
+      "high": 200,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "报价表常见铺大理石60、拼花80-85；企业问答80-200（一线150-200）。墙面干挂见wall_marble_install。",
+      "sources": [
+        {
+          "title": "2025年家庭装修材料人工报价明细表（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1832891552433640698&wfr=spider&for=pc",
+          "date": "2025-05-23"
+        },
+        {
+          "title": "2025大连装修房子报价明细表（装修123）",
+          "url": "https://dl.zx123.cn/zxbk/2781957.html",
+          "date": "2025-12-25"
+        },
+        {
+          "title": "贴大理石人工费多少钱一平（百度智能体）",
+          "url": "https://agents.baidu.com/content/question/6058967abbbaf9e85aec3434",
+          "date": ""
+        }
+      ]
+    },
+    {
+      "key": "floor_terrazzo_cast",
+      "category": "floor",
+      "name_zh": "现浇水磨石/无机磨石（包工包料）",
+      "unit": "m2",
+      "low": 150,
+      "high": 400,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "传统现浇水磨石约80-150（或100-300）；新型液态/无机磨石住宅约180-400；商业/高端300-800。面积小（家装）单价偏高。",
+      "sources": [
+        {
+          "title": "液态磨石包工包料价格（百度文库）",
+          "url": "https://wenku.baidu.com/view/7e6bee0b7c3e0912a21614791711cc7931b778e0.html",
+          "date": "2026-10-13"
+        },
+        {
+          "title": "无机磨石和水磨石价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/766540104811505764.html",
+          "date": "2025-09-22"
+        },
+        {
+          "title": "2025水磨石多少钱一平方（百度智能体）",
+          "url": "https://agents.baidu.com/content/question/67980d14715d4efa7835fac3",
+          "date": ""
+        }
+      ]
+    },
+    {
+      "key": "floor_terrazzo_tile",
+      "category": "floor",
+      "name_zh": "预制水磨石砖（材料）",
+      "unit": "m2",
+      "low": 120,
+      "high": 280,
+      "includes_labor": false,
+      "brands": [],
+      "notes": "预制无机磨石120-280元/㎡。单一来源，铺贴人工另计（参考大板/大理石铺贴）。",
+      "sources": [
+        {
+          "title": "无机磨石和水磨石价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/766540104811505764.html",
+          "date": "2025-09-22"
+        }
+      ]
+    },
+    {
+      "key": "floor_microcement",
+      "category": "floor",
+      "name_zh": "微水泥地面（含施工）",
+      "unit": "m2",
+      "low": 190,
+      "high": 300,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "国产微水泥包工包料：地面190-250 / 200-300 / 140-360；进口600-1000。",
+      "sources": [
+        {
+          "title": "微水泥地面价格（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1824869033544994964&wfr=spider&for=pc",
+          "date": "2025-02-24"
+        },
+        {
+          "title": "微水泥单价150-300元/㎡（含工）（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1844203386088077323&wfr=spider&for=pc",
+          "date": "2025-09-25"
+        },
+        {
+          "title": "国产微水泥地面/墙面施工价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/2130188178124873547.html",
+          "date": "2025-08-07"
+        }
+      ]
+    },
+    {
+      "key": "wall_microcement",
+      "category": "wall",
+      "name_zh": "微水泥墙面（含施工）",
+      "unit": "m2",
+      "low": 100,
+      "high": 280,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "国产墙面100-150（正规厂家包工包料）至100-280。",
+      "sources": [
+        {
+          "title": "微水泥墙面价格（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1824869033544994964&wfr=spider&for=pc",
+          "date": "2025-02-24"
+        },
+        {
+          "title": "国产微水泥地面/墙面施工价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/2130188178124873547.html",
+          "date": "2025-08-07"
+        }
+      ]
+    },
+    {
+      "key": "floor_carpet_wall_to_wall",
+      "category": "floor",
+      "name_zh": "满铺地毯（包工包料）",
+      "unit": "m2",
+      "low": 60,
+      "high": 200,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "家用满铺包工包料50-200（化纤50-150）；尼龙卷材90-180+辅材15-45（工装口径）；丙纶40-80。来源偏弱（AI聚合+工装文章）。",
+      "sources": [
+        {
+          "title": "家装铺地毯多少钱一平方（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/rankList?query=af3493e4723c6c6c0d6d775082af9167&type=20",
+          "date": "2026-07-13"
+        },
+        {
+          "title": "办公地毯真实造价全解析（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1864131843759869846&wfr=spider&for=pc",
+          "date": "2026-05-03"
+        }
+      ]
+    },
+    {
+      "key": "wall_paint_latex",
+      "category": "wall",
+      "name_zh": "乳胶漆墙面（包工包料，含腻子/底漆/两遍面漆）",
+      "unit": "m2",
+      "low": 25,
+      "high": 60,
+      "includes_labor": true,
+      "brands": [
+        "立邦",
+        "多乐士"
+      ],
+      "notes": "按施工面积（墙+顶）计。2026普通乳胶漆包工包料主流25-60；北京多乐士40-60；部分报价20-40不含腻子找平。旧墙铲除/修补另加5-15。",
+      "sources": [
+        {
+          "title": "刷墙包工包料多少钱一平方,2026年装修预算清单（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1875233331139574721&wfr=spider&for=pc",
+          "date": "2026-09-02"
+        },
+        {
+          "title": "上门刷乳胶漆每平方价格是多少（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1875773849967722390&wfr=spider&for=pc",
+          "date": "2026-09-08"
+        },
+        {
+          "title": "北京刷墙漆多乐士包工包料（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1681773903242497787.html",
+          "date": "2025-05-13"
+        }
+      ]
+    },
+    {
+      "key": "wall_paint_labor_only",
+      "category": "wall",
+      "name_zh": "乳胶漆施工纯人工（两遍腻子+底漆+两遍面漆）",
+      "unit": "m2",
+      "low": 15,
+      "high": 20,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "常见16元/㎡（15-20合理）；清包10-20。",
+      "sources": [
+        {
+          "title": "2025年内墙乳胶漆造价成本分析（哔哩哔哩专栏）",
+          "url": "https://www.bilibili.com/read/mobile/41752726",
+          "date": "2025-05-21"
+        },
+        {
+          "title": "内墙腻子涂料清工多少钱一平方（百度知道）",
+          "url": "https://zhidao.baidu.com/question/950859476669858372.html",
+          "date": "2025-10-23"
+        }
+      ]
+    },
+    {
+      "key": "wall_paint_color_premium",
+      "category": "wall",
+      "name_zh": "乳胶漆调色费（每5L桶）",
+      "unit": "piece",
+      "low": 10,
+      "high": 300,
+      "includes_labor": false,
+      "brands": [
+        "立邦",
+        "多乐士"
+      ],
+      "notes": "单位为每5L桶：浅色10-40元，深色/高饱和需专用基漆150-300元。按面积换算需看涂布率（5L约刷两遍30-35㎡，此换算为估计）。",
+      "sources": [
+        {
+          "title": "乳胶漆调色一般多少钱（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1617721288339181667.html",
+          "date": "2025-06-07"
+        },
+        {
+          "title": "乳胶漆调色收费（百度知道）",
+          "url": "https://zhidao.baidu.com/question/637541563280349284.html",
+          "date": "2025-05-30"
+        }
+      ]
+    },
+    {
+      "key": "wallpaper",
+      "category": "wallpaper",
+      "name_zh": "墙纸（包工包料）",
+      "unit": "m2",
+      "low": 50,
+      "high": 150,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "包工包料50-150；只请师傅贴12-22元/㎡或30-50元/卷（一卷约5.3㎡）；普通墙纸30-80、进口200-500（包工包料）。",
+      "sources": [
+        {
+          "title": "90平米全屋贴墙纸大概多少钱（百度知道）",
+          "url": "https://zhidao.baidu.com/question/565370045770719812.html",
+          "date": "2025-03-15"
+        },
+        {
+          "title": "贴墙纸多少钱一平（安居客/58）",
+          "url": "https://mfang.58.com/cq/news/30/794426.html",
+          "date": "2026-10-31"
+        },
+        {
+          "title": "墙纸装修多少钱一平方包人工（爱企查/百度AI聚合）",
+          "url": "https://aiqicha.baidu.com/details/rankList?query=315137781d442f83a827f27fef5a94dd&type=20",
+          "date": "2026-07-22"
+        }
+      ]
+    },
+    {
+      "key": "wall_fabric_seamless",
+      "category": "wallpaper",
+      "name_zh": "无缝墙布（包工包料）",
+      "unit": "m2",
+      "low": 50,
+      "high": 120,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "中档A类无缝墙布50-120（包贴好）；另一来源40-150。",
+      "sources": [
+        {
+          "title": "墙布价格透明指南:50-120元/㎡包工包料（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1872216841846645262&wfr=spider&for=pc",
+          "date": "2026-07-31"
+        },
+        {
+          "title": "墙布价格多少钱一平方米（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1380064617161841059.html",
+          "date": "2025-05-30"
+        }
+      ]
+    },
+    {
+      "key": "wall_wood_veneer_finished",
+      "category": "wall",
+      "name_zh": "成品木饰面（免漆，含安装）",
+      "unit": "m2",
+      "low": 200,
+      "high": 800,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "来源弱：红橡木皮成品木饰面约200含安装（2024）；背景墙木饰面30-800+；带油漆花格约300。科定板等品牌未查到明确价。",
+      "sources": [
+        {
+          "title": "电视背景墙木饰面多少钱一平方（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1125000391899249099.html",
+          "date": "2025-09-22"
+        },
+        {
+          "title": "成品木饰面价格（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1523261876258130620.html",
+          "date": "2024-12-25"
+        }
+      ]
+    },
+    {
+      "key": "wall_wood_panel_solid",
+      "category": "wall",
+      "name_zh": "实木护墙板",
+      "unit": "m2",
+      "low": 800,
+      "high": 2000,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "普通木饰面护墙板800-2000，中式雕花1500-4000。单一来源，价格口径(含安装)未明确。",
+      "sources": [
+        {
+          "title": "木饰面板装修多少钱一平方（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1254286485112412059.html",
+          "date": "2026-09-11"
+        }
+      ]
+    },
+    {
+      "key": "wall_culture_brick",
+      "category": "wall",
+      "name_zh": "文化砖/文化石（材料）",
+      "unit": "m2",
+      "low": 50,
+      "high": 100,
+      "includes_labor": false,
+      "brands": [],
+      "notes": "普通50-100（好的约100），天然板岩约500；铺贴纯人工约65-85元/㎡另计。",
+      "sources": [
+        {
+          "title": "文化砖多少钱一平米（安居客/58）",
+          "url": "https://mfang.58.com/cd/news/36/756293.html",
+          "date": "2026-10-10"
+        },
+        {
+          "title": "文化砖价格（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1826363392806671381&wfr=spider&for=pc",
+          "date": "2025-03-12"
+        },
+        {
+          "title": "贴文化砖的纯人工费（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1810156121501585947.html",
+          "date": "2025-05-10"
+        }
+      ]
+    },
+    {
+      "key": "wall_slab_rock",
+      "category": "wall",
+      "name_zh": "岩板上墙（材料，国产中端）",
+      "unit": "m2",
+      "low": 300,
+      "high": 1000,
+      "includes_labor": false,
+      "brands": [],
+      "notes": "国产中端岩板300-1000，优质800-3000，进口2000+；上墙安装另计150-300（或200-500），见wall_slab_install。",
+      "sources": [
+        {
+          "title": "优质岩板每平方米价格（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1834418154529584326&wfr=spider&for=pc",
+          "date": "2025-06-09"
+        },
+        {
+          "title": "岩板背景墙多少钱一个平方（百度知道）",
+          "url": "https://zhidao.baidu.com/question/509849492729657044.html",
+          "date": "2025-05-05"
+        }
+      ]
+    },
+    {
+      "key": "wall_slab_install",
+      "category": "wall",
+      "name_zh": "岩板上墙安装费",
+      "unit": "m2",
+      "low": 150,
+      "high": 300,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "岩板安装150-300（另一来源200-500，因重、加工难）。",
+      "sources": [
+        {
+          "title": "岩板安装费150-300元/㎡（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1844561915983728206&wfr=spider&for=pc",
+          "date": "2025-09-29"
+        },
+        {
+          "title": "岩板安装费用通常每平方米200-500元（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1834418154529584326&wfr=spider&for=pc",
+          "date": "2025-06-09"
+        }
+      ]
+    },
+    {
+      "key": "wall_marble_install",
+      "category": "wall",
+      "name_zh": "墙面大理石干挂人工",
+      "unit": "m2",
+      "low": 80,
+      "high": 200,
+      "includes_labor": true,
+      "brands": [],
+      "notes": "干挂工钱80-200；家装墙面干挂约120；钢架/龙骨另计。材料价见stone_marble_natural。",
+      "sources": [
+        {
+          "title": "2025年大理石石材价格组成（光明石业）",
+          "url": "http://www.gmcuttingstone.com/index/2556.html",
+          "date": "2024-12-07"
+        },
+        {
+          "title": "大理石铺贴多少钱一平方米（百度知道）",
+          "url": "https://zhidao.baidu.com/question/1873106360794902267.html",
+          "date": "2025-03-10"
+        },
+        {
+          "title": "安徽外墙干挂价格（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1852437951040766809&wfr=spider&for=pc",
+          "date": "2025-12-25"
+        }
+      ]
+    },
+    {
+      "key": "appliance_washer_front_10kg",
+      "category": "appliance",
+      "name_zh": "滚筒洗衣机 10kg",
+      "unit": "piece",
+      "low": 1400,
+      "high": 4000,
+      "includes_labor": null,
+      "brands": [
+        "小天鹅",
+        "海尔",
+        "美的"
+      ],
+      "notes": "京东2025-26：双11小天鹅/海尔10kg入门滚筒到手约1380-1400；主流2000-3000；海尔中高端2500-4000。多为叠加国补(15-20%)和平台券后到手价。",
+      "sources": [
+        {
+          "title": "滚筒洗衣机双11底价（新浪/百度资讯）",
+          "url": "https://www.baidu.com/s?tn=news&wd=%E6%BB%9A%E7%AD%92%E6%B4%97%E8%A1%A3%E6%9C%BA+10%E5%85%AC%E6%96%A4",
+          "date": "2026-10"
+        },
+        {
+          "title": "海尔滚筒洗衣机2500-4000元价位（百家号）",
+          "url": "https://baijiahao.baidu.com/s?id=1849728462147559257&wfr=spider&for=pc",
+          "date": "2025-11-25"
+        },
+        {
+          "title": "小天鹅TG12VE40PRO京东好价（逛丢）",
+          "url": "https://guangdiu.com/api/showdetail.php?id=30339457&plat=app",
+          "date": "2026"
+        }
+      ]
+    },
+    {
+      "key": "appliance_washer_dryer_set",
+      "category": "appliance",
+      "name_zh": "洗烘套装（滚筒+热泵干衣机）",
+      "unit": "piece",
+      "low": 4500,
+      "high": 8000,
+      "includes_labor": null,
+      "brands": [
+        "小天鹅",
+        "海尔",
+        "美的",
+        "西门子"
+      ],
+      "notes": "主流5000-8000；热泵入门4500-6000；京东国补后海尔约6078-7383、小天鹅约7759、美的约6799；促销低价有4106（小天鹅TG10V628AIR套装）。",
+      "sources": [
+        {
+          "title": "洗烘套装主流价位（新浪财经头条）",
+          "url": "https://t.cj.sina.com.cn/articles/view/7879923744/1d5ae182006808tfje",
+          "date": "2026-11-03"
+        },
+        {
+          "title": "小天鹅1.28高洗净比洗烘套装（什么值得买）",
+          "url": "https://www.smzdm.com/p/185166714/",
+          "date": "2026-10-31"
+        }
+      ]
+    },
+    {
+      "key": "appliance_fridge_side_by_side",
+      "category": "appliance",
+      "name_zh": "对开门冰箱（500-620L）",
+      "unit": "piece",
+      "low": 2000,
+      "high": 3500,
+      "includes_labor": null,
+      "brands": [
+        "海尔",
+        "美的",
+        "容声",
+        "美菱"
+      ],
+      "notes": "2026年9月在售1999-6299，2000-3500为主力区间；海尔620L京东2299（2025-08）。",
+      "sources": [
+        {
+          "title": "对开门冰箱2026年真实价格梯队（新浪）",
+          "url": "https://k.sina.com.cn/article_7879996629_1d5af34d506801e5e0.html",
+          "date": "2026-10-27"
+        },
+        {
+          "title": "海尔对开门冰箱620升,京东价2299元（新浪财经）",
+          "url": "https://finance.sina.cn/tech/2025-08-10/detail-infknpix1528691.d.html",
+          "date": "2025-08-10"
+        }
+      ]
+    },
+    {
+      "key": "appliance_fridge_french_door",
+      "category": "appliance",
+      "name_zh": "法式多门冰箱（约500-550L）",
+      "unit": "piece",
+      "low": 3000,
+      "high": 5000,
+      "includes_labor": null,
+      "brands": [
+        "海尔",
+        "美的",
+        "容声"
+      ],
+      "notes": "3000-5000为‘甜点区’；美的550L法式双11到手3999；海尔小红花550L京东到手4874（2025-12）。",
+      "sources": [
+        {
+          "title": "2025年法式多门冰箱选购指南（什么值得买）",
+          "url": "https://post.smzdm.com/p/aeo8k64k/",
+          "date": "2025-12-31"
+        },
+        {
+          "title": "海尔小红花550升法式多门冰箱（什么值得买）",
+          "url": "https://www.smzdm.com/p/164409233/",
+          "date": "2025-12-12"
+        }
+      ]
+    }
+  ]
+}

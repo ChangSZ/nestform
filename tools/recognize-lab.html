@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>识别实验台 · Recognize Lab</title>
+<style>
+body{margin:0;font:13px/1.4 system-ui,"PingFang SC",sans-serif;background:#111419;color:#e7eaf0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(560px,1fr));gap:14px;padding:14px}
+figure{margin:0;background:#1d222a;border-radius:10px;padding:8px}
+canvas{width:100%;display:block;border-radius:6px;background:#fff}
+figcaption{padding:6px 2px 0;font-family:ui-monospace,monospace;font-size:12px;color:#b4bccb;white-space:pre-wrap}
+</style></head>
+<body>
+<!-- 开发工具：对 test-images/ 里的样图批量跑识别，叠加显示墙(蓝) / 窗(青) / 门(橙) / 门洞(黄) / 房间(彩色+名称) -->
+<div class="grid" id="g"></div>
+<script type="module">
+import {analyze, toPlan, typicalDoorPx} from '/src/import/build.js';
+const files = ['lj-01.jpg','lj-02.jpg','lj-03.jpg','lj-04.jpg','lj-05.jpg','lj-06.jpg','lj-07.jpg','lj-08.jpg'];
+const results = {};
+for (const f of files){
+  const im = new Image(); im.src = '/test-images/' + f; await im.decode();
+  const cv = document.createElement('canvas'); cv.width = im.naturalWidth; cv.height = im.naturalHeight;
+  const g = cv.getContext('2d'); g.drawImage(im, 0, 0);
+  const img = g.getImageData(0, 0, cv.width, cv.height);
+  const t0 = performance.now(), an = analyze(img), ms = performance.now() - t0;
+  const td = typicalDoorPx(an.rec), S0 = td ? 850/td : 240/an.T;
+  const {plan} = toPlan(an, S0);
+  g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(0, 0, cv.width, cv.height);
+  const hues = [210, 30, 120, 280, 0, 170, 60, 330, 250, 90];
+  an.rooms.filter(r => r.area*S0*S0 >= 1.5e6).forEach((r, i) => { g.beginPath(); r.poly.forEach(([x, y], k) => k ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fillStyle = `hsla(${hues[i % 10]},70%,60%,.35)`; g.fill(); });
+  g.fillStyle = 'rgba(30,60,200,.85)'; an.rec.walls.forEach(w => g.fillRect(w.x0, w.y0, w.x1 - w.x0, w.y1 - w.y0));
+  an.rec.openings.forEach(o => { const [x0, y0, x1, y1] = o.rect; g.fillStyle = {window:'rgba(0,200,230,.9)', door:'rgba(255,120,0,.9)', open:'rgba(240,200,0,.9)', wall:'rgba(30,60,200,.85)'}[o.kind]; g.fillRect(x0, y0, x1 - x0, y1 - y0); });
+  const s = S0;
+  g.font = 'bold 15px sans-serif'; g.textAlign = 'center'; g.fillStyle = '#000';
+  plan.rooms.forEach(r => { const [x, y] = [r.at[0]/s + an.rec.bbox[0], r.at[1]/s + an.rec.bbox[1]]; g.fillText(r.name, x, y); });
+  const fig = document.createElement('figure'); fig.append(cv);
+  const cap = document.createElement('figcaption');
+  const cnt = k => an.rec.openings.filter(o => o.kind === k).length;
+  cap.textContent = `${f}  ${cv.width}×${cv.height}  ${ms.toFixed(0)}ms  阈值 ${an.rec.threshold}  墙厚 ${an.T}/${an.rec.thinWall}px\n墙 ${an.rec.walls.length}  窗 ${cnt('window')}  门 ${cnt('door')}  门洞 ${cnt('open')}  房间 ${an.rooms.length}  → ${plan.title}`;
+  fig.append(cap); document.getElementById('g').append(fig);
+  results[f] = {S:+S0.toFixed(1), W:+((plan.bounds.w-3700)/1000).toFixed(1), H:+((plan.bounds.h-3500)/1000).toFixed(1), T:an.T, Tmin:an.rec.thinWall, thr:an.rec.threshold, walls:an.rec.walls.length, win:cnt('window'), door:cnt('door'), open:cnt('open'), rooms:plan.rooms.map(r => r.name + ':' + (Math.abs(r.poly.reduce((a,p,i)=>{const q=r.poly[(i+1)%r.poly.length];return a+p[0]*q[1]-q[0]*p[1];},0))/2e6).toFixed(1)).join(' '), ms:Math.round(ms)};
+}
+window.__results = results;
+</script>
+</body></html>

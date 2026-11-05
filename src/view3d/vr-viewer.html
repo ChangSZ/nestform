@@ -1,0 +1,266 @@
+<!doctype html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#101318">
+<title>__TITLE__</title>
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden;background:#101318;color:#eef1f6;font:14px/1.4 Inter,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",system-ui,sans-serif;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+.isl{position:fixed;background:rgba(20,24,31,.74);-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);border:1px solid rgba(255,255,255,.09);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.28)}
+.top{left:16px;top:16px;display:flex;gap:12px;align-items:center;padding:10px 16px 10px 10px;max-width:calc(100% - 220px)}
+.logo{width:38px;height:38px;border-radius:11px;background:#6b8afd;display:grid;place-items:center;flex:none}
+.top b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top small{display:block;color:#aab3c2;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .room{color:#8ea6ff}
+.tools{right:16px;top:16px;display:flex;gap:4px;padding:5px}
+.tools button{height:36px;min-width:36px;padding:0 10px;border:0;border-radius:11px;background:transparent;color:#d6dbe4;font:inherit;font-size:13px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.tools button:hover{background:rgba(255,255,255,.08)}
+.tools button.on{background:#6b8afd;color:#fff}
+.tools svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.map{left:16px;bottom:16px;padding:8px;width:min(270px,40vw)}
+.map .wrap{position:relative;border-radius:10px;overflow:hidden}
+.map img{display:block;width:100%}
+.dot{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;border:3px solid #6b8afd;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.dot.cur{background:#6b8afd;border-color:#fff;z-index:2}
+.cone{position:absolute;width:90px;height:90px;margin:-45px 0 0 -45px;pointer-events:none;z-index:1}
+.cone path{fill:url(#cg)}
+.rooms{left:calc(min(270px,40vw) + 32px);bottom:16px;display:flex;gap:6px;padding:6px;max-width:calc(100% - min(270px,40vw) - 48px);overflow-x:auto;scrollbar-width:none}
+.rooms::-webkit-scrollbar{display:none}
+.rooms button{flex:none;width:112px;border:0;padding:0;border-radius:11px;overflow:hidden;background:#1d222b;color:#d6dbe4;font:inherit;cursor:pointer;outline:2px solid transparent;transition:outline-color .2s}
+.rooms button.on{outline-color:#6b8afd}
+.rooms i{display:block;height:58px;background-size:300% 160%;background-repeat:repeat-x}
+.rooms span{display:block;padding:5px 8px;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rooms span em{font-style:normal;color:#8b95a6;margin-left:4px;font-family:ui-monospace,Menlo,monospace;font-size:11px}
+#hot{position:fixed;inset:0;pointer-events:none}
+.hs{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:99px;background:rgba(18,21,27,.78);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .15s,transform .15s}
+.hs:hover{background:#6b8afd;transform:translate(-50%,-50%) scale(1.06)}
+.hs i{width:26px;height:26px;border-radius:50%;background:#6b8afd;display:grid;place-items:center;animation:pulse 2s infinite}
+.hs:hover i{background:#fff;color:#6b8afd}
+.hs svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(107,138,253,.6)}70%{box-shadow:0 0 0 10px rgba(107,138,253,0)}100%{box-shadow:0 0 0 0 rgba(107,138,253,0)}}
+/* 地面落脚圈：同一房间的其它点位（贴地透视压扁，近大远小） */
+.ring{position:absolute;width:96px;height:96px;margin:-48px 0 0 -48px;pointer-events:auto;cursor:pointer;transform:scale(var(--s,1)) scaleY(.42);transition:filter .15s}
+.ring b{position:absolute;inset:0;border-radius:50%;border:5px solid rgba(255,255,255,.92);background:radial-gradient(circle,rgba(107,138,253,.55) 0 30%,rgba(255,255,255,.12) 31% 100%);box-shadow:0 0 0 3px rgba(0,0,0,.18),0 0 24px rgba(107,138,253,.5)}
+.ring:hover b{border-color:#6b8afd;background:radial-gradient(circle,#fff 0 30%,rgba(107,138,253,.35) 31% 100%)}
+.rooms i{position:relative}
+.rooms i u{position:absolute;right:5px;top:5px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:rgba(18,21,27,.8);color:#fff;font-size:11px;text-decoration:none;display:grid;place-items:center}
+#tip{position:fixed;left:50%;top:76px;transform:translateX(-50%);padding:8px 16px;border-radius:99px;background:rgba(18,21,27,.7);color:#d6dbe4;font-size:13px;pointer-events:none;transition:opacity .6s;white-space:nowrap}
+#veil{position:fixed;inset:0;background:#101318;pointer-events:none;opacity:0;transition:opacity .25s}
+.foot{position:fixed;right:20px;top:70px;color:rgba(255,255,255,.45);font-size:11px;pointer-events:none}
+@media (max-width:720px){
+  .top{max-width:calc(100% - 32px)} .tools{top:auto;bottom:168px;right:12px;flex-direction:column}
+  .tools button span{display:none}
+  .map{width:120px;left:12px;top:84px;bottom:auto;padding:5px}
+  .rooms{left:12px;right:12px;transform:none;max-width:none;bottom:12px}
+  .dot{width:10px;height:10px;margin:-5px 0 0 -5px;border-width:2px} .cone{transform-origin:center;scale:.6}
+  .foot{display:none} #tip{top:auto;bottom:104px;white-space:normal;text-align:center;width:max-content;max-width:86vw}
+}
+</style></head>
+<body>
+<canvas id="c"></canvas>
+<div id="hot"></div>
+<div id="veil"></div>
+<header class="isl top">
+  <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M5 21V9.5L12 4l7 5.5V21h-5v-6.5h-4V21z" fill="#fff"/></svg></div>
+  <div style="min-width:0"><b id="ttl"></b><small><span class="room" id="cur"></span> · <span id="sub"></span></small></div>
+</header>
+<div class="isl tools">
+  <button id="auto" class="on"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v4h-4"/></svg><span></span></button>
+  <button id="gyro" hidden><svg viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg><span></span></button>
+  <button id="fs"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span></span></button>
+</div>
+<div class="isl map"><div class="wrap" id="map"><img id="mapImg" alt=""></div></div>
+<nav class="isl rooms" id="rooms"></nav>
+<div id="tip"></div>
+<div class="foot" id="foot"></div>
+<svg width="0" height="0" style="position:absolute"><defs><radialGradient id="cg"><stop offset="0" stop-color="#6b8afd" stop-opacity=".75"/><stop offset="1" stop-color="#6b8afd" stop-opacity="0"/></radialGradient></defs></svg>
+<script>
+'use strict';
+const D = /*__DATA__*/null;
+const $ = s => document.querySelector(s), R = {}, ROOM = {}; D.nodes.forEach(n => R[n.id] = n); D.rooms.forEach(r => ROOM[r.id] = r);
+document.documentElement.lang = D.lang === 'en' ? 'en' : 'zh-CN';
+$('#ttl').textContent = D.title; $('#sub').textContent = D.sub; $('#tip').textContent = D.t.tip;
+$('#foot').textContent = `${D.brand} · ${D.date}`;
+$('#auto span').textContent = D.t.auto; $('#gyro span').textContent = D.t.gyro; $('#fs span').textContent = D.t.fs;
+
+/* ---------- WebGL：等距柱状全景，两张纹理交叉淡入 ---------- */
+const cv = $('#c');
+let gl = cv.getContext('webgl2', {antialias:false}), G2 = !!gl;
+if (!gl) gl = cv.getContext('webgl', {antialias:false});
+const FS2 = `#version 300 es
+precision highp float; in vec2 p; out vec4 o;
+uniform sampler2D t0, t1; uniform float yaw, pitch, f0, f1, ar, mixT;
+vec3 ray(float f){ vec3 d = normalize(vec3(p.x*ar*f, p.y*f, -1.));
+  float cp = cos(pitch), sp = sin(pitch), cy = cos(yaw), sy = sin(yaw);
+  d = vec3(d.x, d.y*cp - d.z*sp, d.y*sp + d.z*cp);
+  return vec3(d.x*cy - d.z*sy, d.y, d.x*sy + d.z*cy); }
+vec4 pano(sampler2D t, vec3 d){ vec2 uv = vec2(atan(d.x, -d.z)/6.2831853 + .5, asin(clamp(d.y, -1., 1.))/3.1415927 + .5);
+  vec2 dx = dFdx(uv), dy = dFdy(uv); dx.x -= sign(dx.x)*step(.5, abs(dx.x)); dy.x -= sign(dy.x)*step(.5, abs(dy.x));
+  return textureGrad(t, uv, dx, dy); }
+void main(){ o = mix(pano(t0, ray(f0)), pano(t1, ray(f1)), mixT); }`;
+const FS1 = `precision highp float; varying vec2 p;
+uniform sampler2D t0, t1; uniform float yaw, pitch, f0, f1, ar, mixT;
+vec3 ray(float f){ vec3 d = normalize(vec3(p.x*ar*f, p.y*f, -1.));
+  float cp = cos(pitch), sp = sin(pitch), cy = cos(yaw), sy = sin(yaw);
+  d = vec3(d.x, d.y*cp - d.z*sp, d.y*sp + d.z*cp);
+  return vec3(d.x*cy - d.z*sy, d.y, d.x*sy + d.z*cy); }
+vec4 pano(sampler2D t, vec3 d){ return texture2D(t, vec2(atan(d.x, -d.z)/6.2831853 + .5, asin(clamp(d.y, -1., 1.))/3.1415927 + .5)); }
+void main(){ gl_FragColor = mix(pano(t0, ray(f0)), pano(t1, ray(f1)), mixT); }`;
+const VS = G2 ? '#version 300 es\nin vec2 a; out vec2 p; void main(){ p = a; gl_Position = vec4(a, 0., 1.); }' : 'attribute vec2 a; varying vec2 p; void main(){ p = a; gl_Position = vec4(a, 0., 1.); }';
+function sh(type, src){ const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw gl.getShaderInfoLog(s); return s; }
+const prog = gl.createProgram(); gl.attachShader(prog, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, G2 ? FS2 : FS1)); gl.linkProgram(prog); gl.useProgram(prog);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+const al = gl.getAttribLocation(prog, 'a'); gl.enableVertexAttribArray(al); gl.vertexAttribPointer(al, 2, gl.FLOAT, false, 0, 0);
+const U = {}; ['t0', 't1', 'yaw', 'pitch', 'f0', 'f1', 'ar', 'mixT'].forEach(k => U[k] = gl.getUniformLocation(prog, k));
+gl.uniform1i(U.t0, 0); gl.uniform1i(U.t1, 1);
+const texCache = new Map();
+function loadTex(id){
+  if (texCache.has(id)) return texCache.get(id);
+  const pr = new Promise(res => { const img = new Image(); img.onload = () => {
+    const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    if (G2){ gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); }
+    else { gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); }
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    if (G2) gl.texParameterf(gl.TEXTURE_2D, 0x84FE, Math.min(8, gl.getParameter(0x84FF) || 1) || 1);   // 各向异性（若支持）
+    res(t); }; img.src = R[id].img; });
+  texCache.set(id, pr);
+  if (texCache.size > 4) for (const [k, v] of texCache) if (k !== id && k !== cur && k !== prev){ v.then(t => gl.deleteTexture(t)); texCache.delete(k); break; }
+  return pr;
+}
+if (G2 && !gl.getExtension('EXT_texture_filter_anisotropic')) { /* 无各向异性扩展时 texParameterf 被忽略 */ }
+
+/* ---------- 视角状态 ---------- */
+let cur = null, prev = null, tex0 = null, tex1 = null, yaw = 0, pitch = 0, fov = innerWidth >= innerHeight ? 80 : 100, mixT = 1, f0k = 1, auto = true, gyro = null, idleT = 0;
+const FOVMIN = 30, FOVMAX = 105, rad = d => d*Math.PI/180;
+/* 普通透视投影：直线始终是直线；fov 为竖直视场。看不全房间时换个点位，而不是靠超广角硬塞 */
+const scale = () => Math.tan(rad(fov)/2);
+function resize(){ const dpr = Math.min(devicePixelRatio || 1, 2); cv.width = innerWidth*dpr; cv.height = innerHeight*dpr; gl.viewport(0, 0, cv.width, cv.height); }
+addEventListener('resize', resize); resize();
+
+async function go(id, viaLink){
+  if (id === cur || !R[id]) return;
+  const t = await loadTex(id);
+  if (!cur){ tex1 = tex0 = t; cur = id; yaw = R[id].yaw0; mixT = 1; }
+  else {
+    prev = cur; tex0 = tex1; tex1 = t; cur = id; mixT = 0; f0k = 1;
+    if (viaLink) yaw = viaLink.yaw; else yaw = R[id].yaw0;   // 穿过门口：保持朝向，像走进去一样
+    pitch = Math.max(-.25, Math.min(.25, pitch));
+    const t0 = performance.now(), dur = 650;
+    const step = now => { const k = Math.min(1, (now - t0)/dur); mixT = k*k*(3 - 2*k); f0k = 1 - .35*mixT; if (k < 1) requestAnimationFrame(step); else { tex0 = tex1; f0k = 1; } };
+    requestAnimationFrame(step);
+  }
+  $('#cur').textContent = ROOM[R[id].room].name;
+  document.querySelectorAll('.rooms button').forEach(b => b.classList.toggle('on', b.dataset.id === R[id].room));
+  document.querySelectorAll('.dot').forEach(d => d.classList.toggle('cur', d.dataset.id === id));
+  $('.rooms button.on')?.scrollIntoView({behavior:'smooth', inline:'center', block:'nearest'});
+  buildHot(); placeCone();
+  [...(R[id].links || [])].forEach(l => loadTex(l.to));   // 预加载相邻房间
+}
+
+/* ---------- 热点 ---------- */
+const ARROW = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
+let hots = [];
+function buildHot(){
+  const h = $('#hot'); h.innerHTML = '';
+  hots = (R[cur].links || []).map(l => { const el = document.createElement('div');
+    if (l.kind === 'step'){ el.className = 'ring'; el.innerHTML = '<b></b>'; el.title = l.dist + ' m'; }
+    else { el.className = 'hs'; el.innerHTML = `<i>${ARROW}</i>${l.label}`; }
+    el.onclick = e => { e.stopPropagation(); stopAuto(); go(l.to, l); }; h.appendChild(el); return {l, el}; });
+}
+function placeHot(){
+  const ar = innerWidth/innerHeight, f = scale(), cy = Math.cos(yaw), sy = Math.sin(yaw), cp = Math.cos(pitch), sp = Math.sin(pitch);
+  for (const {l, el} of hots){
+    let x = Math.sin(l.yaw)*Math.cos(l.pitch), y = Math.sin(l.pitch), z = -Math.cos(l.yaw)*Math.cos(l.pitch);
+    [x, z] = [x*cy + z*sy, -x*sy + z*cy];                      // 逆偏航
+    [y, z] = [y*cp + z*sp, -y*sp + z*cp];                      // 逆俯仰
+    const vis = z < -.05 && mixT >= 1, sx = x/(-z)/(ar*f), sy2 = y/(-z)/f;
+    if (l.kind === 'step' && vis){ const s = Math.max(.6, Math.min(2.2, 2.6/l.dist))*(Math.tan(rad(40))/f); el.style.setProperty('--s', s.toFixed(3)); }
+    if (!vis || Math.abs(sx) > 1.1 || Math.abs(sy2) > 1.1){ el.style.display = 'none'; continue; }
+    el.style.display = ''; el.style.left = (sx + 1)/2*innerWidth + 'px'; el.style.top = (1 - sy2)/2*innerHeight + 'px';
+  }
+}
+
+/* ---------- 小地图 / 房间条 ---------- */
+$('#mapImg').src = D.map.img;
+const map = $('#map'), cone = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+cone.setAttribute('viewBox', '-45 -45 90 90'); cone.classList.add('cone'); cone.innerHTML = '<path d="M0 0L-26 -38A46 46 0 0 1 26 -38Z"/>'; map.appendChild(cone);
+D.nodes.forEach(n => {
+  const d = document.createElement('div'); d.className = 'dot'; d.dataset.id = n.id; d.title = ROOM[n.room].name;
+  d.style.left = n.pos[0]*100 + '%'; d.style.top = n.pos[1]*100 + '%'; d.onclick = () => { stopAuto(); go(n.id); }; map.appendChild(d);
+});
+D.rooms.forEach(r => {
+  const n = R[r.node], cnt = D.nodes.filter(x => x.room === r.id).length;
+  const b = document.createElement('button'); b.dataset.id = r.id; const u = n.yaw0/(2*Math.PI) + .5;
+  b.innerHTML = `<i style="background-image:url(${n.img});background-position:${(3*u - .5)/2*100}% 50%">${cnt > 1 ? `<u>${cnt}</u>` : ''}</i><span>${r.name}<em>${r.area}m²</em></span>`;
+  b.onclick = () => { stopAuto(); if (R[cur]?.room !== r.id) go(r.node); }; $('#rooms').appendChild(b);
+});
+function placeCone(){ if (!cur) return; const r = R[cur]; cone.style.left = r.pos[0]*100 + '%'; cone.style.top = r.pos[1]*100 + '%'; cone.style.transform = `rotate(${yaw*180/Math.PI}deg)`; }
+
+/* ---------- 交互：拖动 / 缩放 / 键盘 ---------- */
+const ptrs = new Map(); let pinch0 = 0, fov0 = fov;
+function stopAuto(){ auto = false; $('#auto').classList.remove('on'); }
+function hideTip(){ $('#tip').style.opacity = 0; }
+cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]); stopAuto(); hideTip();
+  if (ptrs.size === 2){ const [a, b] = [...ptrs.values()]; pinch0 = Math.hypot(a[0] - b[0], a[1] - b[1]); fov0 = fov; } });
+cv.addEventListener('pointermove', e => {
+  if (!ptrs.has(e.pointerId)) return;
+  const [px, py] = ptrs.get(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]);
+  if (ptrs.size === 2){ const [a, b] = [...ptrs.values()]; fov = Math.max(FOVMIN, Math.min(FOVMAX, fov0*pinch0/Math.max(1, Math.hypot(a[0] - b[0], a[1] - b[1])))); return; }
+  if (gyro) return;
+  const k = rad(fov)/innerHeight;                              // 跟手：拖动 1px ≈ 视场 1px
+  yaw -= (e.clientX - px)*k; pitch = Math.max(-1.45, Math.min(1.45, pitch + (e.clientY - py)*k));
+});
+const up = e => ptrs.delete(e.pointerId); cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+cv.addEventListener('wheel', e => { e.preventDefault(); hideTip(); const dy = e.deltaY*(e.deltaMode === 1 ? 30 : e.deltaMode === 2 ? 600 : 1);
+  fov = Math.max(FOVMIN, Math.min(FOVMAX, fov*Math.exp(Math.max(-120, Math.min(120, dy))*.0015))); }, {passive:false});
+addEventListener('keydown', e => { if (e.key === '+' || e.key === '=') fov = Math.max(FOVMIN, fov/1.12); if (e.key === '-') fov = Math.min(FOVMAX, fov*1.12); });
+const held = {};
+addEventListener('keydown', e => { held[e.key] = true; if (e.key.startsWith('Arrow')) { stopAuto(); e.preventDefault(); } });
+addEventListener('keyup', e => { held[e.key] = false; });
+$('#auto').onclick = () => { auto = !auto; $('#auto').classList.toggle('on', auto); };
+$('#fs').onclick = () => { const d = document, de = d.documentElement; if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d); else (de.requestFullscreen || de.webkitRequestFullscreen)?.call(de); };
+
+/* ---------- 陀螺仪（手机）：设备姿态 → 视线方向 ---------- */
+if (window.DeviceOrientationEvent && matchMedia('(pointer:coarse)').matches) $('#gyro').hidden = false;
+function onOri(e){
+  if (e.alpha == null) return;
+  const a = rad(e.alpha), b = rad(e.beta), g = rad(e.gamma), o = rad(screen.orientation?.angle ?? window.orientation ?? 0);
+  // 欧拉角 (beta, alpha, -gamma, 'YXZ') → 四元数，再绕 X 轴 -90°（相机看向设备背面），再按屏幕方向绕 Z 旋转
+  const c1 = Math.cos(b/2), s1 = Math.sin(b/2), c2 = Math.cos(a/2), s2 = Math.sin(a/2), c3 = Math.cos(-g/2), s3 = Math.sin(-g/2);
+  let q = [s1*c2*c3 + c1*s2*s3, c1*s2*c3 - s1*c2*s3, c1*c2*s3 - s1*s2*c3, c1*c2*c3 + s1*s2*s3];
+  const mul = (p, r) => [p[3]*r[0] + p[0]*r[3] + p[1]*r[2] - p[2]*r[1], p[3]*r[1] - p[0]*r[2] + p[1]*r[3] + p[2]*r[0], p[3]*r[2] + p[0]*r[1] - p[1]*r[0] + p[2]*r[3], p[3]*r[3] - p[0]*r[0] - p[1]*r[1] - p[2]*r[2]];
+  q = mul(q, [-Math.SQRT1_2, 0, 0, Math.SQRT1_2]); q = mul(q, [0, 0, -Math.sin(o/2), Math.cos(o/2)]);
+  const [x, y, z, w] = q, fx = -2*(x*z + w*y), fy = -2*(y*z - w*x), fz = -(1 - 2*(x*x + y*y));   // 前向 (0,0,-1) 旋转后
+  const gy = Math.atan2(fx, -fz), gp = Math.asin(Math.max(-1, Math.min(1, fy)));
+  if (gyro.off == null) gyro.off = yaw - gy;
+  yaw = gy + gyro.off; pitch = gp;
+}
+$('#gyro').onclick = async () => {
+  if (gyro){ removeEventListener('deviceorientation', onOri); gyro = null; $('#gyro').classList.remove('on'); return; }
+  try { if (DeviceOrientationEvent.requestPermission && await DeviceOrientationEvent.requestPermission() !== 'granted') return; } catch(_){ return; }
+  gyro = {off:null}; stopAuto(); addEventListener('deviceorientation', onOri); $('#gyro').classList.add('on');
+};
+
+/* ---------- 渲染循环 ---------- */
+let last = performance.now();
+function loop(now){
+  requestAnimationFrame(loop);
+  const dt = Math.min(.05, (now - last)/1000); last = now;
+  if (auto && !ptrs.size) yaw += dt*.09;
+  if (held.ArrowLeft) yaw -= dt*1.2; if (held.ArrowRight) yaw += dt*1.2;
+  if (held.ArrowUp) pitch = Math.min(1.45, pitch + dt); if (held.ArrowDown) pitch = Math.max(-1.45, pitch - dt);
+  if (!tex1) return;
+  const f = scale();
+  gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, tex0); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, tex1);
+  gl.uniform1f(U.yaw, yaw); gl.uniform1f(U.pitch, pitch); gl.uniform1f(U.f0, f*f0k); gl.uniform1f(U.f1, f); gl.uniform1f(U.ar, cv.width/cv.height); gl.uniform1f(U.mixT, mixT);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  placeHot(); placeCone();
+  idleT += dt; if (idleT > 6) hideTip();
+}
+go(D.start).then(() => requestAnimationFrame(loop));
+</script>
+</body></html>
