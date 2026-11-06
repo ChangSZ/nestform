@@ -23,6 +23,31 @@ export const ln = (x1,y1,x2,y2,ex='') => `<line x1="${x1}" y1="${y1}" x2="${x2}"
 export const pa = (d,f='none',ex='') => `<path d="${d}" fill="${f}" ${ST} ${ex}/>`;
 export const DASH = 'stroke-dasharray="4 3"';
 
+/* 灯具：暖黄半透明 + 虚线（吊顶类不遮住下面的家具），统一用灯具图例的画法 */
+const LS = 'stroke="#b7791f" stroke-width="1" vector-effect="non-scaling-stroke"', LF = 'fill="#fff3c4" fill-opacity=".55"';
+const lc = (cx, cy, r, ex = '') => `<circle cx="${cx}" cy="${cy}" r="${Math.max(1, r)}" ${LF} ${LS} ${ex}/>`;
+const cross = (cx, cy, r) => `<path d="M${cx-r} ${cy}H${cx+r}M${cx} ${cy-r}V${cy+r}" fill="none" ${LS}/>`;
+function lampSVG(t,x,y,w,d){
+  const m = Math.min(w,d), r = m/2;
+  switch (t){
+    case 'ceilround': return lc(0,0,r,DASH) + lc(0,0,r*.55) + cross(0,0,r*.85);
+    case 'ceilsquare': return `<rect x="${x}" y="${y}" width="${w}" height="${d}" ${LF} ${LS} ${DASH}/>` + `<rect x="${x+w*.2}" y="${y+d*.2}" width="${w*.6}" height="${d*.6}" ${LF} ${LS}/>` + cross(0,0,m*.42);
+    case 'chandelier': { let s = lc(0,0,r,DASH) + lc(0,0,r*.12); for (let i = 0; i < 8; i++){ const a = i/8*Math.PI*2, rr = r*(i % 2 ? .62 : .9); s += `<path d="M0 0L${Math.cos(a)*rr} ${Math.sin(a)*rr}" ${LS}/>` + lc(Math.cos(a)*rr, Math.sin(a)*rr, r*.1); } return s; }
+    case 'pendant': return `<rect x="${x}" y="${-Math.min(d,70)/2}" width="${w}" height="${Math.min(d,70)}" rx="30" ${LF} ${LS}/>` + lc(x+100,0,30) + lc(x+w-100,0,30);
+    case 'pendant3': return [-1,0,1].map(k => lc(k*w/3, 0, Math.min(150, w/7))).join('') + `<path d="M${-w/3} 0H${w/3}" ${LS} ${DASH}/>`;
+    case 'fanlamp': { let s = lc(0,0,r,DASH) + lc(0,0,r*.18); for (let i = 0; i < 5; i++) s += `<ellipse cx="${r*.55}" cy="0" rx="${r*.38}" ry="${r*.1}" transform="rotate(${i*72})" fill="none" ${LS}/>`; return s; }
+    case 'downlight': return lc(0,0,r) + lc(0,0,r*.4);
+    case 'tracklight': { const n = Math.max(2, Math.round(w/400)); let s = `<rect x="${x}" y="-20" width="${w}" height="40" ${LF} ${LS}/>`; for (let i = 0; i < n; i++) s += lc(x + w*(i+.5)/n, 0, 40); return s; }
+    case 'bathheater': { let s = `<rect x="${x}" y="${y}" width="${w}" height="${d}" ${LF} ${LS} ${DASH}/>` + `<rect x="${-w*.22}" y="${-d*.15}" width="${w*.44}" height="${d*.3}" ${LF} ${LS}/>`; [-1,1].forEach(sd => { for (let k = 0; k < 4; k++) s += `<path d="M${-w*.35} ${sd*(d*.22+k*25)}H${w*.35}" ${LS}/>`; }); return s; }
+    case 'bedpendant': return lc(0,0,r*.8) + lc(0,0,r*.25);
+    case 'walllamp': return `<path d="M${x+w*.15} ${y}A${w*.35} ${d*.9} 0 0 0 ${x+w*.85} ${y}Z" ${LF} ${LS}/>` + lc(0, y+d*.55, Math.min(40, w*.12));
+    case 'mirrorlight': return `<rect x="${x}" y="${y}" width="${w}" height="${Math.min(d, 90)}" rx="20" ${LF} ${LS}/>` + `<path d="M${x+40} ${y+Math.min(d,90)/2}H${x+w-40}" ${LS}/>`;
+    case 'tablelamp': { let s = lc(0,0,r*.85) + lc(0,0,r*.3); for (let i = 0; i < 8; i++){ const a = i/8*Math.PI*2; s += `<path d="M${Math.cos(a)*r*.9} ${Math.sin(a)*r*.9}L${Math.cos(a)*r*1.05} ${Math.sin(a)*r*1.05}" ${LS}/>`; } return s; }
+    case 'archlamp': return `<circle cx="${x+200}" cy="0" r="170" fill="#e8e4dd" ${ST}/>` + `<path d="M${x+200} 0Q0 ${-d*.9} ${x+w-200} 0" fill="none" ${LS} ${DASH}/>` + lc(x+w-200, 0, 200);
+  }
+  return '';
+}
+
 /* 高低床（俯视看到的是上层床）：床垫 + 枕头 + 被子；虚线 = 下层床 / 拖床 / 床下书桌；另画爬梯、梯柜台阶、滑梯 */
 function bunkSVG(t,x,y,w,d,c){
   const top = (bx0, bx1, by0, by1, alongY = false) => {                 // 一张床的俯视（床头在左；alongY 时床头在上）
@@ -63,6 +88,7 @@ export function furnSVG(t,w,d,c,cab){
       s += pa(`M${x+w-15-Math.min(420,w*.3)} ${by}L${x+w-15} ${by}L${x+w-15} ${by+Math.min(420,w*.3)}Z`, shade(c,1.12));
       return s;
     }
+    case 'ceilround': case 'ceilsquare': case 'chandelier': case 'pendant': case 'pendant3': case 'fanlamp': case 'downlight': case 'tracklight': case 'bathheater': case 'bedpendant': case 'walllamp': case 'mirrorlight': case 'tablelamp': case 'archlamp': return lampSVG(t,x,y,w,d);
     case 'bunkbed': case 'bunkstairs': case 'trundlebed': case 'lbunk': case 'loftbed': case 'slidebed': return bunkSVG(t,x,y,w,d,c);
     case 'sofa': case 'armchair': {
       const b = d*.24, a = Math.min(200,w*.13), n = t==='armchair' ? 1 : (w>2200 ? 3 : 2), cw = (w-2*a)/n, dk = shade(c,.85);

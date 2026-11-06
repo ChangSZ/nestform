@@ -177,7 +177,7 @@ const C = {
       else if (![[b[0], b[1]], [b[2], b[1]], [b[0], b[3]], [b[2], b[3]]].every(p => pointInPoly([Math.min(Math.max(p[0], b[0] + 30), b[2] - 30), Math.min(Math.max(p[1], b[1] + 30), b[3] - 30)], room.poly))) issues.push(`家具「${f.name}」超出了「${roomName(s, room)}」的范围`);
       return {id:f.id, type:f.type, name:f.name, at:[f.cx, f.cy], size:[f.w, f.d], rot:f.rot, room:room ? roomName(s, room) : null};
     });
-    const solid = s.furniture.filter(f => !['rug', 'plant', 'baycushion'].includes(f.type));
+    const solid = s.furniture.filter(f => !['rug', 'plant', 'baycushion', 'ceilround', 'ceilsquare', 'chandelier', 'pendant', 'pendant3', 'fanlamp', 'downlight', 'tracklight', 'bathheater', 'bedpendant', 'walllamp', 'mirrorlight', 'tablelamp'].includes(f.type));   // 软装、吊顶 / 壁装灯具、台灯不算占地
     for (let i = 0; i < solid.length; i++) for (let j = i + 1; j < solid.length; j++){
       const a = box(solid[i]), b = box(solid[j]), ov = Math.min(a[2], b[2]) - Math.max(a[0], b[0]), oh = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
       if (ov > 50 && oh > 50) issues.push(`家具「${solid[i].name}」和「${solid[j].name}」重叠 ${ov}×${oh}mm`);

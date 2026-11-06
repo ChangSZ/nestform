@@ -11,6 +11,8 @@ import {isArc, arcOutline, arcRects} from '../arcs.js';
 import {isDem} from '../demolish.js';
 import {K, wallFinishMat, FOV, wx, wz, M, matCache, mat, floorMat, box, rbox, fronts, metal} from '../view3d/kit.js';
 import {buildFurniture} from '../view3d/furniture.js';
+import {MAIN_LIGHTS} from '../view3d/lamps.js';
+import {pointInPoly} from '../import/rooms.js';
 
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
@@ -244,8 +246,8 @@ export function buildArch(){
     const ceil = new THREE.Mesh(cg, mat('#fbfaf7', {roughness:1})); ceil.position.y = H; ceil.visible = top >= H; archUp.add(ceil);
     if (r.at){
       const lamp = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, .02, 32), new THREE.MeshStandardMaterial({color:'#fff', emissive:'#fff2d6', emissiveIntensity:.3}));
-      lamp.position.set(wx(r.at[0]), H - .012, wz(r.at[1])); lamp.visible = top >= H; lampG.add(lamp);
-      const pl = new THREE.PointLight(0xffd9a8, 0, 7, 1.6); pl.position.set(wx(r.at[0]), H - .25, wz(r.at[1])); lampG.add(pl);
+      lamp.position.set(wx(r.at[0]), H - .012, wz(r.at[1])); lamp.visible = top >= H; lamp.userData = {room:r.id, show:top >= H}; lampG.add(lamp);
+      const pl = new THREE.PointLight(0xffd9a8, 0, 7, 1.6); pl.position.set(wx(r.at[0]), H - .25, wz(r.at[1])); pl.userData.room = r.id; lampG.add(pl);
     }
   });
   [...P().doors.filter((d, i) => !isDem('door', i)), ...P().slides.filter((d, i) => !isDem('slide', i))].forEach(d => { const [x0, y0, x1, y1] = d.rect; const s = box(M(x1-x0), .012, M(y1-y0), mat('#d8d0c0', {roughness:.3}), wx((x0+x1)/2), 0, wz((y0+y1)/2)); s.castShadow = false; archFloor.add(s); });
@@ -340,10 +342,37 @@ function buildWallSkins(top){
 }
 const cornerMat = new THREE.LineBasicMaterial({color:0x5f5a52, transparent:true, opacity:.55});
 
+const MAX_LAMP_LIGHTS = 12;                                          // 点光源太多会拖慢渲染：超出的灯只发光不照明
 function buildFurn(){
   clearGroup(furnG);
-  state.furniture.forEach(f => furnG.add(buildFurniture(f)));
-  furnG.visible = opt.furn; selKey = null; applyGrow();
+  const gs = state.furniture.map(f => buildFurniture(f));
+  // 台灯：放到下方家具的台面上（向下打一条射线，取 1.25m 以下最高的水平面）
+  const ray = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0);
+  gs.forEach((g, i) => {
+    if (g.userData.lamp?.mount !== 'top') return;
+    const f = state.furniture[i]; let y = 0;
+    gs.forEach((h, j) => {
+      if (j === i || h.userData.lamp) return;
+      h.updateMatrixWorld(true); ray.set(new THREE.Vector3(wx(f.cx), 1.25, wz(f.cy)), down);
+      for (const hit of ray.intersectObject(h, true)){ const n = hit.face?.normal.clone().transformDirection(hit.object.matrixWorld); if (n && n.y > .9){ y = Math.max(y, hit.point.y); break; } }
+    });
+    g.position.y = y;
+  });
+  // 灯的光源：夜景时打开；主照明（吸顶 / 吊灯 / 筒灯…）优先
+  let n = 0;
+  gs.map((g, i) => [g, state.furniture[i]]).filter(([g]) => g.userData.lamp?.at).sort(([a], [b]) => b.userData.lamp.k - a.userData.lamp.k).forEach(([g]) => {
+    if (n++ >= MAX_LAMP_LIGHTS) return;
+    const L = g.userData.lamp, pl = new THREE.PointLight(0xffd9a8, 0, L.dist, 1.6); pl.position.set(...L.at); pl.userData.lampK = L.k; g.add(pl);
+  });
+  gs.forEach(g => { if (g.userData.lamp?.mount === 'ceil') g.userData.walkOnly = true; furnG.add(g); });
+  furnG.children.forEach(o => { if (o.userData.walkOnly) o.visible = opt.mode === 'walk'; });
+  syncRoomLamps();
+  furnG.visible = opt.furn; selKey = null; applyLight(); applyGrow();
+}
+/** 房间里放了主照明灯具时，关掉这间房自动生成的顶灯 */
+function syncRoomLamps(){
+  const lit = new Set(state.furniture.filter(f => MAIN_LIGHTS.includes(f.type)).map(f => P().rooms.find(r => pointInPoly([f.cx, f.cy], r.poly))?.id).filter(Boolean));
+  lampG.children.forEach(o => { o.userData.off = lit.has(o.userData.room); if (!o.isPointLight) o.visible = !o.userData.off && o.userData.show; });
 }
 
 export function buildLabels(){
@@ -362,7 +391,7 @@ export function buildLabels(){
 export function sync(force){
   if (!inited || (!active && !force)) return;
   const pl = JSON.stringify(state.plan), a = pl + JSON.stringify([state.rooms, state.demolished, opt.cut]), f = pl + JSON.stringify(state.furniture), l = JSON.stringify([state.rooms, opt.cut]);
-  if (force || a !== sigArch){ sigArch = a; buildArch(); }
+  if (force || a !== sigArch){ sigArch = a; buildArch(); syncRoomLamps(); }
   if (force || f !== sigFurn){ sigFurn = f; buildFurn(); }
   if (force || l !== sigLabels){ sigLabels = l; buildLabels(); }
 }
@@ -383,7 +412,9 @@ export function applyLight(){
   hemi.intensity = opt.night ? .12 : .85; fillLight.intensity = opt.night ? .04 : (opt.mode === 'walk' ? .75 : .45);
   scene.background = new THREE.Color(opt.night ? 0x0d1220 : 0xe9edf2);
   ground.material.color.set(opt.night ? 0x1a2030 : 0xe3e8ee);
-  lampG.children.forEach(o => { if (o.isPointLight) o.intensity = opt.night ? 6 : 0; else o.material.emissiveIntensity = opt.night ? 2 : .3; });
+  // 白天把点光源整个隐藏（强度为 0 也会进着色器计算，隐藏的才会被渲染器跳过）
+  lampG.children.forEach(o => { if (o.isPointLight){ o.visible = opt.night && !o.userData.off; o.intensity = 6; } else o.material.emissiveIntensity = opt.night ? 2 : .3; });
+  furnG?.traverse(o => { if (o.isPointLight && o.userData.lampK){ o.visible = opt.night; o.intensity = o.userData.lampK; } });
   renderer.toneMappingExposure = opt.night ? 1.25 : 1.05;
   K.envK = opt.night ? .15 : 1; matCache.forEach(m => { if (m.envMap) m.envMapIntensity = m.userData.env*K.envK; });
 }
@@ -584,7 +615,7 @@ export function setMode(m){
     orbit.target.set(0, 0, 0); flyTo(isoWhole());
   }
   showLabels(opt.labels && m === 'orbit');
-  archUp.traverse(o => { if (o.userData.walkOnly) o.visible = m === 'walk'; });
+  [archUp, furnG].forEach(G => G.traverse(o => { if (o.userData.walkOnly) o.visible = m === 'walk'; }));
   applyLight();
 }
 export function blocked(x, z, r = .22){

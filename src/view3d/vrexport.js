@@ -128,9 +128,9 @@ export async function exportVR(download, toast){
   // —— 进入「VR 拍摄」状态：满层高（带吊顶）、棱线 / 阴角线、漫游补光，隐藏标签与选中框
   const keep = {cut:opt.cut, fill:fillLight.intensity, labels:labelG.visible, sel:selHelper?.visible};
   if (opt.cut < 99){ opt.cut = 99; sync(); }
-  archUp.traverse(o => { if (o.userData.walkOnly) o.visible = true; });
+  [archUp, furnG].forEach(G => G.traverse(o => { if (o.userData.walkOnly) o.visible = true; }));
   fillLight.intensity = .75; labelG.visible = false; if (selHelper) selHelper.visible = false;
-  const tall = furnG.children.map(o => new THREE.Box3().setFromObject(o)).filter(b => b.max.y > 1.2);
+  const tall = furnG.children.filter(o => !o.userData.lamp || o.userData.lamp.mount === 'floor').map(o => new THREE.Box3().setFromObject(o)).filter(b => b.max.y > 1.2 && b.min.y < .5);   // 吊灯 / 壁灯不挡路
   const obs = obstacles(tall), links = passages(rooms), eq = makeEquirect(), b = pl.bounds;
   // 每个房间的点位 → 全局点位表
   const nodes = [];
@@ -153,7 +153,7 @@ export async function exportVR(download, toast){
   } finally {
     eq.dispose();
     if (keep.cut !== opt.cut){ opt.cut = keep.cut; syncCutBtns(); sync(); }
-    archUp.traverse(o => { if (o.userData.walkOnly) o.visible = opt.mode === 'walk'; });
+    [archUp, furnG].forEach(G => G.traverse(o => { if (o.userData.walkOnly) o.visible = opt.mode === 'walk'; }));
     fillLight.intensity = keep.fill; labelG.visible = keep.labels; if (selHelper) selHelper.visible = keep.sel;
   }
   toast(tr('正在打包 VR 看房…', 'Packaging VR tour…')); await frame();
