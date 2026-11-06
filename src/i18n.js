@@ -17,7 +17,7 @@ export const NAMES_EN = {
   '300 防滑砖':'300 Anti-slip Tile', '水磨石':'Terrazzo', '满铺地毯':'Wall-to-wall Carpet',
   '卧室':'Bedroom', '餐厨':'Dining & Kitchen', '卫浴':'Bathroom', '家电':'Appliances', '书房 · 休闲':'Study & Leisure',
   '双人床 1.8m':'Double Bed 1.8m', '双人床 1.5m':'Double Bed 1.5m', '双人床':'Double Bed', '单人床':'Single Bed', '婴儿床':'Crib',
-  '儿童床':"Kids' Beds", '上下铺（直梯）':'Bunk Bed (Ladder)', '梯柜高低床':'Bunk Bed with Stair Drawers', '子母床（拖床）':'Bed with Trundle', '错层 L 型高低床':'L-shaped Bunk Bed', '高架床（下方书桌）':'Loft Bed with Desk', '滑梯城堡床':'Castle Bed with Slide',
+  '玄关 · 收纳':'Entry & Storage', '软装 · 装饰':'Decor', '灯具':'Lighting', '上下铺（直梯）':'Bunk Bed (Ladder)', '梯柜高低床':'Bunk Bed with Stair Drawers', '子母床（拖床）':'Bed with Trundle', '错层 L 型高低床':'L-shaped Bunk Bed', '高架床（下方书桌）':'Loft Bed with Desk', '滑梯城堡床':'Castle Bed with Slide',
   '床头柜':'Nightstand', '衣柜':'Wardrobe', '小衣柜':'Small Wardrobe', '梳妆台':'Dresser', '书桌':'Desk', '椅子':'Chair',
   '书架':'Bookshelf', '飘窗垫':'Bay Cushion', '三人沙发':'3-Seat Sofa', '双人沙发':'Loveseat', '转角沙发':'Corner Sofa',
   '单人沙发':'Armchair', '懒人沙发':'Beanbag', '茶几':'Coffee Table', '边几':'Side Table', '电视柜':'TV Stand', '地毯':'Rug',
