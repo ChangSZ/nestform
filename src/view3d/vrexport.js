@@ -130,7 +130,7 @@ export async function exportVR(download, toast){
   if (opt.cut < 99){ opt.cut = 99; sync(); }
   [archUp, furnG].forEach(G => G.traverse(o => { if (o.userData.walkOnly) o.visible = true; }));
   fillLight.intensity = .75; labelG.visible = false; if (selHelper) selHelper.visible = false;
-  const tall = furnG.children.filter(o => !o.userData.lamp || o.userData.lamp.mount === 'floor').map(o => new THREE.Box3().setFromObject(o)).filter(b => b.max.y > 1.2 && b.min.y < .5);   // 吊灯 / 壁灯不挡路
+  const tall = furnG.children.filter(o => o.userData.mount === 'floor').map(o => new THREE.Box3().setFromObject(o)).filter(b => b.max.y > 1.2 && b.min.y < .5);   // 吊灯 / 壁灯不挡路
   const obs = obstacles(tall), links = passages(rooms), eq = makeEquirect(), b = pl.bounds;
   // 每个房间的点位 → 全局点位表
   const nodes = [];

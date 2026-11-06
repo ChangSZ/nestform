@@ -7,7 +7,7 @@
  *  用法：node tools/nf.mjs <命令> <方案.json> [参数]     node tools/nf.mjs help
  * ===================================================================== */
 import {readFileSync, writeFileSync, existsSync} from 'node:fs';
-import {LIB, MATS, WALL_MATS, defaultState, defaultWall} from '../src/data.js';
+import {LIB, MATS, WALL_MATS, MOUNT, WINDOW_DRESSING, fitToWindow, defaultState, defaultWall} from '../src/data.js';
 import {extractRooms, pointInPoly} from '../src/import/rooms.js';
 
 /* ---------- 参数解析 ---------- */
@@ -155,8 +155,9 @@ const C = {
     if (!it) die(`没有家具类型「${opts.add}」（用 catalog furniture 查看）`);
     const [cx, cy] = pt(opts.at).map(r10), rot = +(opts.rot || 0) % 360;
     const f = {id:uid('f'), type:it[0], name:opts.name || it[1], cx, cy, w:num('w', it[2]), d:num('d', it[3]), rot, color:opts.color || it[4], ...(it[5] ? {cab:structuredClone(it[5])} : {})};
+    const fitted = WINDOW_DRESSING.includes(f.type) && opts.rot == null && fitToWindow(f, s.plan.wins, (x, y) => s.plan.rooms.some(r => pointInPoly([x, y], r.poly)));   // 窗帘：吸附到最近的窗
     if (f.type === 'rug') s.furniture.unshift(f); else s.furniture.push(f);
-    save(s); ok(`${f.name}（${f.type}）${f.w}×${f.d} @ ${cx},${cy} 旋转 ${rot}° id=${f.id}`);
+    save(s); ok(`${f.name}（${f.type}）${f.w}×${f.d} @ ${f.cx},${f.cy} 旋转 ${f.rot}° id=${f.id}` + (fitted ? '（已吸附到窗前）' : ''));
   },
   mat(){
     const s = load(), r = findRoom(s, String(opts.room || '')); if (!r) die(`没有房间「${opts.room}」（info 查看房间名）`);
@@ -177,7 +178,7 @@ const C = {
       else if (![[b[0], b[1]], [b[2], b[1]], [b[0], b[3]], [b[2], b[3]]].every(p => pointInPoly([Math.min(Math.max(p[0], b[0] + 30), b[2] - 30), Math.min(Math.max(p[1], b[1] + 30), b[3] - 30)], room.poly))) issues.push(`家具「${f.name}」超出了「${roomName(s, room)}」的范围`);
       return {id:f.id, type:f.type, name:f.name, at:[f.cx, f.cy], size:[f.w, f.d], rot:f.rot, room:room ? roomName(s, room) : null};
     });
-    const solid = s.furniture.filter(f => !['rug', 'plant', 'baycushion', 'ceilround', 'ceilsquare', 'chandelier', 'pendant', 'pendant3', 'fanlamp', 'downlight', 'tracklight', 'bathheater', 'bedpendant', 'walllamp', 'mirrorlight', 'tablelamp'].includes(f.type));   // 软装、吊顶 / 壁装灯具、台灯不算占地
+    const solid = s.furniture.filter(f => !['plant', 'baycushion'].includes(f.type) && !MOUNT[f.type]);   // 吊顶 / 壁装 / 台面摆件 / 平铺的地毯不算占地
     for (let i = 0; i < solid.length; i++) for (let j = i + 1; j < solid.length; j++){
       const a = box(solid[i]), b = box(solid[j]), ov = Math.min(a[2], b[2]) - Math.max(a[0], b[0]), oh = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
       if (ov > 50 && oh > 50) issues.push(`家具「${solid[i].name}」和「${solid[j].name}」重叠 ${ov}×${oh}mm`);

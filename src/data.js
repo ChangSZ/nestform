@@ -133,29 +133,42 @@ export const LIB = [
     ['bed','双人床 1.8m',1800,2000,'#9fb4c7'],['bed','双人床 1.5m',1500,2000,'#b8c4d9'],['bed','单人床',1200,2000,'#d9c2a0'],
     ['nightstand','床头柜',450,400,'#e6dfd4'],['wardrobe','衣柜',2000,600,'#eef0f2'],
     ['wardrobe','小衣柜',1200,550,'#eef0f2'],['dresser','梳妆台',1000,450,'#eef0f2'],['desk','书桌',1200,600,'#d8c4a6'],
-    ['chair','椅子',450,480,'#cfc6b8'],['bookshelf','书架',800,300,'#d8c4a6'],['baycushion','飘窗垫',520,1800,'#e7dccd']]},
+    ['chair','椅子',450,480,'#cfc6b8'],['bookshelf','书架',800,300,'#d8c4a6'],['baycushion','飘窗垫',520,1800,'#e7dccd'],
+    ['benchend','床尾凳',1400,420,'#c9a98a'],['stool','化妆凳',400,400,'#e2d3c0'],['tatami','榻榻米地台',2400,2000,'#d9c9a8']]},
   // 儿童高低床：宽 = 床长方向（含爬梯 / 梯柜 / 滑梯），深 = 床宽方向；靠背一侧（深的 -y 侧）贴墙
   {cat:'儿童房', items:[
     ['bunkbed','上下铺（直梯）',2080,1300,'#d9c2a0'],['bunkstairs','梯柜高低床',2580,1260,'#e3d3bb'],
     ['trundlebed','子母床（拖床）',2080,1700,'#cfdcd2'],['lbunk','错层 L 型高低床',2120,2120,'#d8c4a6'],
     ['loftbed','高架床（下方书桌）',2080,1080,'#e9e4dc'],['slidebed','滑梯城堡床',3240,1100,'#efe6d8'],
-    ['crib','婴儿床',1250,700,'#efe3d0']]},
+    ['crib','婴儿床',1250,700,'#efe3d0'],['kiddesk','儿童书桌椅',1000,900,'#e9e4dc'],['toyshelf','玩具收纳柜',1000,350,'#f1ece4'],
+    ['playtent','游戏帐篷',1200,1200,'#f2d3c3'],['playmat','爬行垫',2000,1800,'#bcd7e6']]},
   {cat:'客厅', items:[
     ['sofa','三人沙发',2400,900,'#8396a8'],['sofa','双人沙发',1700,880,'#a9b6c6'],['cornersofa','转角沙发',2800,1700,'#8396a8'],
     ['armchair','单人沙发',850,850,'#d08c60'],['beanbag','懒人沙发',800,800,'#e3a46f'],['coffeetable','茶几',1300,650,'#e6dfd4'],
-    ['sidetable','边几',500,500,'#d9c3a3'],['tvstand','电视柜',2400,400,'#d8c4a6']]},
+    ['sidetable','边几',500,500,'#d9c3a3'],['tvstand','电视柜',2400,400,'#d8c4a6'],['soundbar','回音壁音箱',1000,120,'#2b2b2d'],
+    ['screen','投影幕布',2600,100,'#f4f4f2'],['rocker','摇椅',700,1000,'#b08458'],['chaise','贵妃椅',1700,700,'#c7b8a6'],
+    ['aquarium','鱼缸',1200,450,'#2b2d31'],['cattree','猫爬架',600,600,'#d9c9a8'],['petbed','宠物窝',700,550,'#c9a98a']]},
   {cat:'餐厨', items:[
     ['table','餐桌',1400,800,'#d8c4a6'],['table','六人餐桌',1800,900,'#d8c2a2'],['roundtable','圆桌',1000,1000,'#d8c4a6'],
     ['chair','餐椅',450,480,'#cfc6b8'],['island','岛台',1800,900,'#e9e5de'],['barstool','吧椅',420,420,'#6b5d4c'],
     ['counter','橱柜台面',1600,600,'#e9e5de'],['stove','燃气灶',750,450,'#dcdcdc'],['ksink','水槽',800,450,'#e1e6ea'],
-    ['cabinet','餐边柜',1600,400,'#eef0f2'],['dishwasher','洗碗机',600,600,'#c9ced3'],['ovencol','蒸烤箱高柜',600,600,'#eef0f2']]},
+    ['cabinet','餐边柜',1600,400,'#eef0f2'],['dishwasher','洗碗机',600,600,'#c9ced3'],['ovencol','蒸烤箱高柜',600,600,'#eef0f2'],
+    ['hood','抽油烟机',900,500,'#c9ced3'],['microwave','微波炉',500,400,'#2b2d31'],['trashbin','垃圾桶',350,300,'#d8dde2']]},
   {cat:'卫浴', items:[
     ['toilet','马桶',400,700,'#ffffff'],['vanity','浴室柜',800,500,'#eef1f3'],['vanity','双盆浴室柜',1200,500,'#eef1f3'],
-    ['shower','淋浴房',900,900,'#e4edf2'],['bathtub','浴缸',1600,750,'#eef3f6'],['waterheater','电热水器',800,450,'#f4f4f2']]},
+    ['shower','淋浴房',900,900,'#e4edf2'],['bathtub','浴缸',1600,750,'#eef3f6'],['waterheater','电热水器',800,450,'#f4f4f2'],
+    ['smarttoilet','智能马桶',420,720,'#ffffff'],['mirrorcab','浴室镜柜',800,150,'#eef1f3'],['towelrack','毛巾架',600,120,'#c9ced3'],['mopsink','拖把池',450,400,'#ffffff']]},
   {cat:'玄关 · 收纳', items:[
-    ['shoecab','鞋柜',1000,350,'#eef0f2'],['shoecab','玄关柜',1400,380,'#e6dccc'],['cabinet','储物柜',1000,400,'#eef0f2']]},
+    ['shoecab','鞋柜',1000,350,'#eef0f2'],['shoecab','玄关柜',1400,380,'#e6dccc'],['cabinet','储物柜',1000,400,'#eef0f2'],
+    ['shoebench','换鞋凳',1000,350,'#c9a98a'],['coatrack','衣帽架',450,450,'#8d7258'],['fullmirror','穿衣镜',600,80,'#d8c4a6']]},
+  {cat:'阳台', items:[
+    ['dryrack','升降晾衣架',2000,450,'#d8dde2'],['balconyset','阳台桌椅',1200,700,'#b08458'],['hangchair','吊椅',900,900,'#d9c9a8'],['plantstand','花架',800,350,'#8d7258']]},
   {cat:'软装 · 装饰', items:[
-    ['rug','地毯',2400,1700,'#d9cbb8'],['plant','绿植',500,500,'#86b28a'],['plant','大绿植',700,700,'#79a87e']]},
+    ['rug','地毯',2400,1700,'#d9cbb8'],['plant','绿植',500,500,'#86b28a'],['plant','大绿植',700,700,'#79a87e'],
+    ['painting','挂画',900,40,'#c98f6b'],['decomirror','装饰镜',700,40,'#c9a86a'],['vase','花瓶摆件',250,250,'#e9e2d6']]},
+  // 窗帘：放到窗户附近会自动吸附到窗前、按窗宽铺满、朝向房间
+  {cat:'窗帘', items:[
+    ['drapes','布帘 + 纱帘',2000,180,'#c7b8a6'],['rollerblind','卷帘',1500,80,'#e9e4dc'],['venetian','百叶帘',1500,80,'#d8c4a6']]},
   // 灯具：吸顶 / 吊装类自动挂到顶棚（3D 只在漫游里显示），壁灯贴墙（靠背一侧），台灯放在下方家具的台面上；夜景时会亮
   {cat:'灯具', items:[
     ['ceilround','圆形吸顶灯',600,600,'#d8d4cc'],['ceilsquare','方形吸顶灯',600,600,'#d8d4cc'],['chandelier','客厅主灯（多头）',900,900,'#c9a86a'],
@@ -165,7 +178,8 @@ export const LIB = [
     ['tablelamp','台灯',300,300,'#c9a86a'],['floorlamp','落地灯',450,450,'#3d3a34'],['archlamp','钓鱼灯',1500,400,'#eef0f2']]},
   {cat:'家电', items:[
     ['tv','65 寸电视',1450,80,'#1d1d1f'],['tv','55 寸电视',1230,80,'#1d1d1f'],
-    ['aircon','柜机空调',500,380,'#f6f7f8'],['acwall','挂机空调',900,250,'#f6f7f8'],['purifier','空气净化器',400,300,'#f4f4f2']]},
+    ['aircon','柜机空调',500,380,'#f6f7f8'],['acwall','挂机空调',900,250,'#f6f7f8'],['purifier','空气净化器',400,300,'#f4f4f2'],
+    ['robotvac','扫地机器人基站',400,450,'#f4f4f2'],['dehumid','除湿机',350,250,'#f4f4f2'],['freshair','新风机',700,220,'#f6f7f8'],['radiator','暖气片',1000,100,'#f4f4f2']]},
   {cat:'洗衣 · 烘干', items:[
     ['washer','滚筒洗衣机',600,600,'#e6ebee'],['toploader','波轮洗衣机',560,580,'#eef1f4'],['washdryer','洗烘一体机',600,640,'#c3c8ce'],
     ['tripletub','三筒分区洗衣机',650,700,'#e8eaed'],['twintub','双子分区洗衣机',600,650,'#d9dde2'],['washstack','洗烘叠放套装',600,650,'#e6ebee'],
@@ -191,6 +205,43 @@ export const LIB = [
 export const typeColor = t => { for (const c of LIB) for (const i of c.items) if (i[0]===t) return i[4]; return '#eee'; };
 
 export let _n = 1;
+/* ---------- 安装方式：不是落地摆放的物件 ----------
+ *  ceil 吸顶 / 吊装（3D 挂到顶棚，只在漫游里显示）；wall 壁装（模型自带离地高度，靠背一侧贴墙）；
+ *  top 放在下方家具的台面上；flat 平铺在地上（地毯、爬行垫）。不在表里的都是落地家具 */
+export const MOUNT = {
+  ceilround:'ceil', ceilsquare:'ceil', chandelier:'ceil', pendant:'ceil', pendant3:'ceil', fanlamp:'ceil', downlight:'ceil', tracklight:'ceil', bathheater:'ceil', bedpendant:'ceil',
+  screen:'ceil', dryrack:'ceil',
+  walllamp:'wall', mirrorlight:'wall', acwall:'wall', hood:'wall', mirrorcab:'wall', towelrack:'wall', freshair:'wall', radiator:'wall', painting:'wall', decomirror:'wall',
+  drapes:'wall', rollerblind:'wall', venetian:'wall',
+  tablelamp:'top', soundbar:'top', microwave:'top', vase:'top',
+  rug:'flat', playmat:'flat',
+};
+/** 窗帘类：放下时吸附到最近的窗 */
+export const WINDOW_DRESSING = ['drapes', 'rollerblind', 'venetian'];
+/**
+ * 把窗帘对齐到 (x, y) 附近 1.5m 内最近的窗：贴着窗的室内一侧，宽度铺满窗（布帘两边各多出 150），靠背朝窗。
+ * inRoom(x, y) 判断一点是否在室内（用来决定窗的哪一侧是房间）；没有合适的窗时不改。返回是否吸附成功
+ */
+export function fitToWindow(f, wins, inRoom){
+  let best = null, bd = 1500;
+  for (const w of wins){
+    const [x0, y0, x1, y1] = w, dx = Math.max(x0 - f.cx, 0, f.cx - x1), dy = Math.max(y0 - f.cy, 0, f.cy - y1), dd = Math.hypot(dx, dy);
+    if (dd < bd){ bd = dd; best = w; }
+  }
+  if (!best) return false;
+  const [x0, y0, x1, y1] = best, hz = x1 - x0 >= y1 - y0, L = hz ? x1 - x0 : y1 - y0, D = f.d, extra = f.type === 'drapes' ? 300 : 0;
+  f.w = Math.round(L + extra);
+  if (hz){
+    const m = (x0 + x1)/2, below = inRoom(m, y1 + 300), above = inRoom(m, y0 - 300);
+    const down = below || !above;                                        // 房间在窗的下方（南侧）→ 靠背朝北
+    Object.assign(f, {cx:m, cy:down ? y1 + D/2 : y0 - D/2, rot:down ? 0 : 180});
+  } else {
+    const m = (y0 + y1)/2, right = inRoom(x1 + 300, m), left = inRoom(x0 - 300, m);
+    const r = right || !left;
+    Object.assign(f, {cx:r ? x1 + D/2 : x0 - D/2, cy:m, rot:r ? 270 : 90});
+  }
+  return true;
+}
 export const uid = () => 'f' + Date.now().toString(36) + (_n++);
 export const F = (type,name,cx,cy,w,d,rot=0,color) => ({id:uid(),type,name,cx,cy,w,d,rot,color:color||typeColor(type)});
 

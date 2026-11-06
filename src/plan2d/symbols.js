@@ -23,6 +23,51 @@ export const ln = (x1,y1,x2,y2,ex='') => `<line x1="${x1}" y1="${y1}" x2="${x2}"
 export const pa = (d,f='none',ex='') => `<path d="${d}" fill="${f}" ${ST} ${ex}/>`;
 export const DASH = 'stroke-dasharray="4 3"';
 
+/* 各空间小件 / 软装 / 窗帘的俯视图例 */
+function decorSVG(t,x,y,w,d,c){
+  const m = Math.min(w,d);
+  switch (t){
+    case 'benchend': return rc(x,y,w,d,c,'rx="50"') + rc(x+40,y+40,w-80,d-80,shade(c,1.08),'rx="40"');
+    case 'stool': return ec(0,0,w/2,d/2,c) + ec(0,0,w*.32,d*.32,shade(c,1.08));
+    case 'tatami': { let s = rc(x,y,w,d,'#d9c9a8'); const nx = Math.max(1, Math.round(w/900)), nz = Math.max(1, Math.round(d/1800)); for (let i = 1; i < nx; i++) s += ln(x+w*i/nx,y,x+w*i/nx,y+d); for (let k = 1; k < nz; k++) s += ln(x,y+d*k/nz,x+w,y+d*k/nz); return s + rc(x,y+d-60,w,60,shade(c,.85)); }
+    case 'kiddesk': { const dd = Math.min(600, d*.62); return rc(x,y,w,dd,c,'rx="15"') + rc(-190,y+dd+40,380,340,'#8fb3d9','rx="30"') + rc(-190,y+dd+340,380,40,shade('#8fb3d9',.8)); }
+    case 'toyshelf': { let s = rc(x,y,w,d,c); const n = Math.max(2, Math.round(w/330)); for (let i = 1; i < n; i++) s += ln(x+w*i/n,y,x+w*i/n,y+d); return s; }
+    case 'playtent': return pa(`M${x} ${y}L${x+w} ${y}L${x+w} ${y+d}L${x} ${y+d}Z`, c) + pa(`M${x} ${y}L${x+w} ${y+d}M${x+w} ${y}L${x} ${y+d}`) + pa(`M${-w*.25} ${y+d}L0 ${y+d*.6}L${w*.25} ${y+d}Z`, '#fff');
+    case 'playmat': { let s = rc(x,y,w,d,'#f4efe6','rx="20"'); const n = 4; for (let i = 0; i < n; i++) for (let k = 0; k < n; k++) if ((i+k) % 2) s += rc(x+w*i/n+20,y+d*k/n+20,w/n-40,d/n-40,['#f2b8a0','#8fb3d9','#a8d0b0','#f3d27a','#c7b3e0'][(i*3+k) % 5],'stroke-opacity="0"'); return s; }
+    case 'soundbar': return rc(x,y,w,d,c,'rx="30"');
+    case 'screen': return rc(x,y,w,d,'#f4f4f2',DASH) + ln(x+60,0,x+w-60,0,DASH);
+    case 'rocker': return rc(x+w*.1,y+d*.1,w*.8,d*.8,'#e9e2d6','rx="60"') + pa(`M${x} ${y}V${y+d}M${x+w} ${y}V${y+d}`,'none','stroke-width="3"') + rc(x+w*.1,y+d*.1,w*.8,d*.18,shade(c,.9),'rx="30"');
+    case 'chaise': return rc(x,y,w,d,shade(c,.85),'rx="60"') + rc(x+300,y+150,w-350,d-200,c,'rx="40"') + rc(x,y,300,d,shade(c,.75),'rx="60"');
+    case 'aquarium': return rc(x,y,w,d,'#bfe3f2','rx="10"') + rc(x+30,y+30,w-60,d-60,'#5fa8c9','fill-opacity=".5"') + ec(-w*.15,0,60,25,'#f08a3c') + ec(w*.2,d*.1,50,20,'#f3d27a');
+    case 'cattree': return rc(x,y,w,d,c,'rx="40"') + `<circle cx="${-w*.22}" cy="${-d*.15}" r="${m*.1}" fill="#c9b48c" ${ST}/>` + rc(0,0,w*.45,d*.4,shade(c,.85),'rx="30"');
+    case 'petbed': return ec(0,0,w/2,d/2,c) + ec(0,0,w*.34,d*.3,'#efe7da');
+    case 'hood': return rc(x,y,w,d*.75,'#c9ced3') + rc(-150,y,300,250,shade('#c9ced3',.85)) + ln(x,y+d*.75,x+w,y+d*.75,DASH);
+    case 'microwave': return rc(x,y,w,d,c,'rx="15"') + rc(x+w*.72,y+40,w*.22,d-80,'#d8dde2');
+    case 'trashbin': return rc(x,y,w,d,c,'rx="60"') + ln(x+60,0,x+w-60,0);
+    case 'smarttoilet': return rc(x,y,w,d*.36,'#fff','rx="40"') + ec(0,y+d*.62,w*.46,d*.36,'#fff') + ec(0,y+d*.64,w*.3,d*.24,'#e9eef2') + rc(x+w,y+d*.25,40,100,'#d8dde2');
+    case 'mirrorcab': return rc(x,y,w,d,'#dfe9ee') + ln(0,y,0,y+d);
+    case 'towelrack': return rc(x,y,w,30,'#c9ced3') + rc(x+w*.15,y+40,w*.55,d-50,'#f3e6d4','rx="10"');
+    case 'mopsink': return rc(x,y,w,d,'#fff','rx="30"') + rc(x+40,y+60,w-80,d-100,'#e9eef2','rx="20"');
+    case 'shoebench': return rc(x,y,w,d,c,'rx="20"') + rc(x+30,y+30,w-60,d-60,'#e9e2d6','rx="20"');
+    case 'coatrack': return `<circle r="${m/2}" fill="none" ${ST} ${DASH}/>` + `<circle r="${m*.08}" fill="${c}" ${ST}/>` + [0,90,180,270].map(a => `<line x1="0" y1="0" x2="${m*.32}" y2="0" transform="rotate(${a})" ${ST}/>`).join('');
+    case 'fullmirror': return rc(x,y,w,d,c) + rc(x+30,y+10,w-60,d-20,'#dfe9ee');
+    case 'dryrack': return rc(x,y,w,d,'none',DASH) + ln(x,-d*.27,x+w,-d*.27) + ln(x,d*.27,x+w,d*.27);
+    case 'balconyset': return ec(0,0,Math.min(320,d/2),Math.min(320,d/2),c) + rc(x,-210,420,420,'#cfc6b8','rx="40"') + rc(x+w-420,-210,420,420,'#cfc6b8','rx="40"');
+    case 'hangchair': return ec(0,y+d*.6,w*.42,d*.36,c) + ec(0,y+d*.62,w*.3,d*.25,'#f3e6d4') + pa(`M${-w*.35} ${y+60}Q0 ${y-60} ${w*.35} ${y+60}`,'none','stroke-width="3"');
+    case 'plantstand': return rc(x,y,w,d,shade(c,1.2)) + ln(x,y+d/3,x+w,y+d/3) + ln(x,y+d*2/3,x+w,y+d*2/3) + [[-w/4,-d/3],[w/4,0],[-w/4,d/3]].map(([px,py]) => `<circle cx="${px}" cy="${py}" r="${Math.min(90,d/4)}" fill="#86b28a" ${ST}/>`).join('');
+    case 'painting': return rc(x,y,w,d,'#2b2b2d') + rc(x+20,y,w-40,d-10,c);
+    case 'decomirror': return rc(x,y,w,d,c) + rc(x+40,y,w-80,d-10,'#dfe9ee');
+    case 'vase': return `<circle r="${m*.35}" fill="${c}" ${ST}/>` + [0,120,240].map(a => `<circle cx="${m*.22}" cy="0" r="${m*.12}" transform="rotate(${a})" fill="#f2b8a0" ${ST}/>`).join('');
+    case 'drapes': { const n = Math.max(6, Math.round(w/120)); let p = `M${x} ${y+d*.65}`; for (let k = 1; k <= n; k++){ const tx = x + w*k/n; p += `Q${tx - w/n/2} ${k % 2 ? y+d : y+d*.3} ${tx} ${y+d*.65}`; } return rc(x,y,w,d*.25,'#e9e9e7') + ln(x,y+d*.45,x+w,y+d*.45,'stroke-dasharray="2 3" opacity=".6"') + pa(p,'none',`stroke="${shade(c,.7)}" stroke-width="2"`); }
+    case 'rollerblind': return rc(x,y,w,d,c) + ln(x,0,x+w,0,DASH);
+    case 'venetian': { let s = rc(x,y,w,d,c); for (let px = x+80; px < x+w-40; px += 80) s += ln(px,y,px,y+d,'opacity=".5"'); return s; }
+    case 'robotvac': return rc(x+w*.05,y,w*.9,d*.5,c,'rx="30"') + `<circle cx="0" cy="${y+d*.72}" r="${Math.min(w,d)*.38}" fill="#2b2b2d" ${ST}/>`;
+    case 'dehumid': return rc(x,y,w,d,c,'rx="30"') + rc(x+30,y+30,w-60,d-60,'none',DASH);
+    case 'freshair': return rc(x,y,w,d,c,'rx="20"') + ln(x+50,y+d*.6,x+w-50,y+d*.6);
+    case 'radiator': { let s = rc(x,y,w,d,c); for (let px = x+60; px < x+w-20; px += 60) s += ln(px,y,px,y+d,'opacity=".6"'); return s; }
+  }
+  return rc(x,y,w,d,c);
+}
 /* 灯具：暖黄半透明 + 虚线（吊顶类不遮住下面的家具），统一用灯具图例的画法 */
 const LS = 'stroke="#b7791f" stroke-width="1" vector-effect="non-scaling-stroke"', LF = 'fill="#fff3c4" fill-opacity=".55"';
 const lc = (cx, cy, r, ex = '') => `<circle cx="${cx}" cy="${cy}" r="${Math.max(1, r)}" ${LF} ${LS} ${ex}/>`;
@@ -89,6 +134,7 @@ export function furnSVG(t,w,d,c,cab){
       return s;
     }
     case 'ceilround': case 'ceilsquare': case 'chandelier': case 'pendant': case 'pendant3': case 'fanlamp': case 'downlight': case 'tracklight': case 'bathheater': case 'bedpendant': case 'walllamp': case 'mirrorlight': case 'tablelamp': case 'archlamp': return lampSVG(t,x,y,w,d);
+    case 'benchend': case 'stool': case 'tatami': case 'kiddesk': case 'toyshelf': case 'playtent': case 'playmat': case 'soundbar': case 'screen': case 'rocker': case 'chaise': case 'aquarium': case 'cattree': case 'petbed': case 'hood': case 'microwave': case 'trashbin': case 'smarttoilet': case 'mirrorcab': case 'towelrack': case 'mopsink': case 'shoebench': case 'coatrack': case 'fullmirror': case 'dryrack': case 'balconyset': case 'hangchair': case 'plantstand': case 'painting': case 'decomirror': case 'vase': case 'drapes': case 'rollerblind': case 'venetian': case 'robotvac': case 'dehumid': case 'freshair': case 'radiator': return decorSVG(t,x,y,w,d,c);
     case 'bunkbed': case 'bunkstairs': case 'trundlebed': case 'lbunk': case 'loftbed': case 'slidebed': return bunkSVG(t,x,y,w,d,c);
     case 'sofa': case 'armchair': {
       const b = d*.24, a = Math.min(200,w*.13), n = t==='armchair' ? 1 : (w>2200 ? 3 : 2), cw = (w-2*a)/n, dk = shade(c,.85);

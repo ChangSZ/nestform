@@ -20,5 +20,11 @@ nf('furn', F, '--add', 'wardrobe', '--at', '2200,4000');               // 挡在
 check(JSON.parse(nf('info', F, '--json')).issues.some(s => /挡住/.test(s)), '能发现挡门的家具');
 let threw = false; try { execFileSync('node', ['tools/nf.mjs', 'door', F, '--at', '3000,3000'], {stdio:'pipe'}); } catch { threw = true; }
 check(threw, '开在墙外的门会报错');
+// 窗帘：放在窗附近会吸附到窗的室内一侧、按窗宽铺满（窗 1300–3100，y 0 为外墙内皮）
+nf('furn', F, '--add', 'drapes', '--at', '2000,600');
+const dr = JSON.parse(readFileSync(F, 'utf8')).furniture.find(f => f.type === 'drapes');
+check(dr.w === 1800 + 300 && dr.cx === 2200 && dr.cy === dr.d/2 && dr.rot === 0, `窗帘吸附到窗前（${dr.w}×${dr.d} @ ${dr.cx},${dr.cy} ${dr.rot}°）`);
+nf('furn', F, '--add', 'painting', '--at', '2200,3520', '--rot', '180');
+check(!JSON.parse(nf('info', F, '--json')).issues.some(s => /挂画/.test(s)), '壁挂物件不算占地重叠');
 rmSync(F);
 if (fail){ console.log(`${fail} 项失败`); process.exit(1); }

@@ -2,7 +2,9 @@ import {K, wx, wz, M, mat, rng, sh, mesh, rot, box, rbox, cyl, lathe, rod, tube,
 
 import * as THREE from 'three';
 import {buildBunk} from './bunks.js';
-import {buildLamp, isLamp, LAMP_MOUNT} from './lamps.js';
+import {buildLamp, isLamp} from './lamps.js';
+import {buildDecor, DECOR} from './decor.js';
+import {MOUNT} from '../data.js';
 /* 滚筒舱门：玻璃视窗 + 金属门圈，z = 机身正面 */
 function porthole(g, x, y, z, R0, glass = '#26343d', open = .78){
   const dr = new THREE.Mesh(new THREE.CircleGeometry(R0, 40), mat('#1b1f22', {roughness:.6})); dr.position.set(x, y, z + .004); g.add(dr);
@@ -108,8 +110,12 @@ function buildCabinet(g, f, w, d, c, R){
 export function buildFurniture(f){
   const g = new THREE.Group(), w = M(f.w), d = M(f.d), c = f.color || '#ddd', bz = -d/2, R = rng(Math.round(f.w*7 + f.d*13 + f.cx + f.cy));
   // 灯具：模型 + 光源信息（夜景时由 index.js 放点光源），落地灯沿用下面原有的模型
-  if (isLamp(f.type)) g.userData.lamp = {...buildLamp(f.type === 'floorlamp' ? null : g, f.type, w, d, c, R), mount:LAMP_MOUNT[f.type]};
-  if (isLamp(f.type) && f.type !== 'floorlamp'){ g.position.set(wx(f.cx), 0, wz(f.cy)); g.rotation.y = -f.rot*Math.PI/180; g.userData.fid = f.id; return g; }
+  g.userData.mount = MOUNT[f.type] || 'floor';                       // 安装方式：吊顶 / 壁装 / 台面 / 平铺 / 落地
+  if (isLamp(f.type)) g.userData.lamp = buildLamp(f.type === 'floorlamp' ? null : g, f.type, w, d, c, R);
+  if ((isLamp(f.type) && f.type !== 'floorlamp') || DECOR.has(f.type)){
+    if (DECOR.has(f.type)) buildDecor(g, f.type, w, d, c, R);
+    g.position.set(wx(f.cx), 0, wz(f.cy)); g.rotation.y = -f.rot*Math.PI/180; g.userData.fid = f.id; return g;
+  }
   switch (f.type){
     case 'bed': {
       const fr = woodM('#8d7258'), fab = fabric(c), fh = .3, mt = .22, top = fh + mt, n = Math.max(3, Math.round(w/.28)), sw = (w - .04)/n;

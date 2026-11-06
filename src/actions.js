@@ -3,7 +3,8 @@ import {wallChain, wallRun, PREFIX} from './demolish.js';
 import {partOf} from './plan2d/partitions.js';
 import {syncPartCur} from './ui/library.js';
 import {tr, nm} from './i18n.js';
-import {uid, F} from './data.js';
+import {uid, F, WINDOW_DRESSING, fitToWindow} from './data.js';
+import {pointInPoly} from './import/rooms.js';
 import {COARSE, $, svg, state, ui, mutate, getF, P} from './store.js';
 import {aabb, norm, snapRects} from './geom.js';
 import {renderMeasure, renderSel} from './plan2d/render.js';
@@ -39,7 +40,8 @@ export function pushOut(f){
 export function addItem(it, x, y){
   const [type,name,w,d,color] = it, f = F(type,name,Math.round(x/10)*10,Math.round(y/10)*10,w,d,0,color);
   if (it[5]) f.cab = structuredClone(it[5]);                       // 定制柜参数
-  pushOut(f);
+  // 窗帘：吸附到附近的窗（贴着窗的室内一侧、按窗宽铺满）；附近没有窗就照常放
+  if (!(WINDOW_DRESSING.includes(type) && fitToWindow(f, P().wins.filter((w, i) => !state.demolished.includes('n' + i)), (px, py) => P().rooms.some(r => pointInPoly([px, py], r.poly))))) pushOut(f);
   ui.sel = {kind:'furn', id:f.id};
   mutate(() => type==='rug' ? state.furniture.unshift(f) : state.furniture.push(f));
   toast(tr(`已添加「${name}」${w}×${d}`, `Added "${nm(name)}" ${w}×${d}`));

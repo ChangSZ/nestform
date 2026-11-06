@@ -13,7 +13,7 @@ import {furnSVG} from '../plan2d/symbols.js';
 import {esc, renderPanel} from '../ui/panel.js';
 
 /* ======================= 渲染 ======================= */
-export const NOLABEL = ['plant','floorlamp','sidetable','barstool','beanbag','ceilround','ceilsquare','chandelier','pendant','pendant3','fanlamp','downlight','tracklight','bathheater','bedpendant','walllamp','mirrorlight','tablelamp','archlamp'];
+export const NOLABEL = ['plant','floorlamp','sidetable','barstool','beanbag','ceilround','ceilsquare','chandelier','pendant','pendant3','fanlamp','downlight','tracklight','bathheater','bedpendant','walllamp','mirrorlight','tablelamp','archlamp','soundbar','screen','towelrack','mirrorcab','painting','decomirror','vase','drapes','rollerblind','venetian','dryrack','coatrack','radiator','freshair','hood','microwave','trashbin','playtent','playmat','cattree'];
 export function renderRooms(){
   let s = '';
   let clips = '';

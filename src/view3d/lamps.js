@@ -7,14 +7,11 @@
 import * as THREE from 'three';
 import {K, mat, box, rbox, cyl, lathe, rod, blob, ring, glowMat, chrome, blackMetal, woodM} from './kit.js';
 
-/** 类型 → 安装方式 */
-export const LAMP_MOUNT = {
-  ceilround:'ceil', ceilsquare:'ceil', chandelier:'ceil', pendant:'ceil', pendant3:'ceil', fanlamp:'ceil', downlight:'ceil', tracklight:'ceil', bathheater:'ceil', bedpendant:'ceil',
-  walllamp:'wall', mirrorlight:'wall', tablelamp:'top', archlamp:'floor', floorlamp:'floor',
-};
+/** 灯具类型（安装方式见 data.js MOUNT） */
+const LAMPS = new Set(['ceilround', 'ceilsquare', 'chandelier', 'pendant', 'pendant3', 'fanlamp', 'downlight', 'tracklight', 'bathheater', 'bedpendant', 'walllamp', 'mirrorlight', 'tablelamp', 'archlamp', 'floorlamp']);
 /** 算「主照明」的灯：房间里放了它们，就关掉这间房自动生成的顶灯 */
 export const MAIN_LIGHTS = ['ceilround', 'ceilsquare', 'chandelier', 'pendant', 'pendant3', 'fanlamp', 'downlight', 'tracklight'];
-export const isLamp = t => t in LAMP_MOUNT;
+export const isLamp = t => LAMPS.has(t);
 
 const warm = (k = .9) => glowMat('#fffaf0', '#ffe3b0', k);
 /** 吊杆 / 吊线：从顶棚垂到 y */

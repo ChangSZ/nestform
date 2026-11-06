@@ -346,13 +346,13 @@ const MAX_LAMP_LIGHTS = 12;                                          // 点光�
 function buildFurn(){
   clearGroup(furnG);
   const gs = state.furniture.map(f => buildFurniture(f));
-  // 台灯：放到下方家具的台面上（向下打一条射线，取 1.25m 以下最高的水平面）
+  // 台面摆件（台灯、音箱、微波炉、花瓶）：放到下方家具的台面上（向下打一条射线，取 1.25m 以下最高的水平面）
   const ray = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0);
   gs.forEach((g, i) => {
-    if (g.userData.lamp?.mount !== 'top') return;
+    if (g.userData.mount !== 'top') return;
     const f = state.furniture[i]; let y = 0;
     gs.forEach((h, j) => {
-      if (j === i || h.userData.lamp) return;
+      if (j === i || h.userData.mount === 'top' || h.userData.mount === 'ceil' || h.userData.mount === 'wall') return;
       h.updateMatrixWorld(true); ray.set(new THREE.Vector3(wx(f.cx), 1.25, wz(f.cy)), down);
       for (const hit of ray.intersectObject(h, true)){ const n = hit.face?.normal.clone().transformDirection(hit.object.matrixWorld); if (n && n.y > .9){ y = Math.max(y, hit.point.y); break; } }
     });
@@ -364,7 +364,7 @@ function buildFurn(){
     if (n++ >= MAX_LAMP_LIGHTS) return;
     const L = g.userData.lamp, pl = new THREE.PointLight(0xffd9a8, 0, L.dist, 1.6); pl.position.set(...L.at); pl.userData.lampK = L.k; g.add(pl);
   });
-  gs.forEach(g => { if (g.userData.lamp?.mount === 'ceil') g.userData.walkOnly = true; furnG.add(g); });
+  gs.forEach(g => { if (g.userData.mount === 'ceil') g.userData.walkOnly = true; furnG.add(g); });
   furnG.children.forEach(o => { if (o.userData.walkOnly) o.visible = opt.mode === 'walk'; });
   syncRoomLamps();
   furnG.visible = opt.furn; selKey = null; applyLight(); applyGrow();
