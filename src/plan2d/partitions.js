@@ -13,7 +13,7 @@ export const PARTS = () => [
   {key:'walldoor', name:tr('墙 + 门', 'Wall + door'),             thick:100, split:true,  color:'#a3adbb'},
   {key:'slide',    name:tr('推拉门隔断', 'Sliding doors'),          thick:100, split:true,  color:'#9cc3e6'},
   {key:'glass',    name:tr('玻璃隔断', 'Glass partition'),          thick:80,  split:true,  color:'#9cc3e6'},
-  {key:'combo',    name:tr('门 + 上窗下柜', 'Door + glass over cabinet'), thick:350, split:true, color:'#d8c4a6'},
+  {key:'combo',    name:tr('单开门 + 上窗下柜', 'Swing door + glass over cabinet'), thick:350, split:true, color:'#d8c4a6'},
   {key:'lowwall',  name:tr('半高墙', 'Half-height wall'),         thick:120, split:false, color:'#dfe4eb'},
   {key:'curtain',  name:tr('帘子', 'Curtain'),                   thick:80,  split:false, color:'#d9cbb8'},
   {key:'slats',    name:tr('木格栅', 'Wood slat screen'),          thick:60,  split:false, color:'#b08458'},

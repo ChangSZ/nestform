@@ -1,6 +1,7 @@
 import {K, wx, wz, M, mat, rng, sh, mesh, rot, box, rbox, cyl, lathe, rod, tube, blob, ring, shell, darker, lighter, legs, metal, chrome, blackMetal, mirror, ceramic, fabric, woodM, screenMat, glowMat, pull, fronts, vase, tableLamp, plate} from '../view3d/kit.js';
 
 import * as THREE from 'three';
+import {buildBunk} from './bunks.js';
 /* 滚筒舱门：玻璃视窗 + 金属门圈，z = 机身正面 */
 function porthole(g, x, y, z, R0, glass = '#26343d', open = .78){
   const dr = new THREE.Mesh(new THREE.CircleGeometry(R0, 40), mat('#1b1f22', {roughness:.6})); dr.position.set(x, y, z + .004); g.add(dr);
@@ -501,6 +502,7 @@ export function buildFurniture(f){
       }
       break;
     }
+    case 'bunkbed': case 'bunkstairs': case 'trundlebed': case 'lbunk': case 'loftbed': case 'slidebed': buildBunk(g, f.type, w, d, c, R); break;
     case 'crib': {
       const wm = woodM(c);
       g.add(rbox(w - .09, .12, d - .09, fabric('#ffffff'), 0, .3, 0, .04), box(w - .06, .025, d - .06, wm, 0, .28));

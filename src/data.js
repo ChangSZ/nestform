@@ -130,9 +130,15 @@ export const defaultWall = (id, mat) => /bath|laundry|kitchen/.test(id) || ['ant
 export const LIB = [
   {cat:'卧室', items:[
     ['bed','双人床 1.8m',1800,2000,'#9fb4c7'],['bed','双人床 1.5m',1500,2000,'#b8c4d9'],['bed','单人床',1200,2000,'#d9c2a0'],
-    ['crib','婴儿床',1250,700,'#efe3d0'],['nightstand','床头柜',450,400,'#e6dfd4'],['wardrobe','衣柜',2000,600,'#eef0f2'],
+    ['nightstand','床头柜',450,400,'#e6dfd4'],['wardrobe','衣柜',2000,600,'#eef0f2'],
     ['wardrobe','小衣柜',1200,550,'#eef0f2'],['dresser','梳妆台',1000,450,'#eef0f2'],['desk','书桌',1200,600,'#d8c4a6'],
     ['chair','椅子',450,480,'#cfc6b8'],['bookshelf','书架',800,300,'#d8c4a6'],['baycushion','飘窗垫',520,1800,'#e7dccd']]},
+  // 儿童高低床：宽 = 床长方向（含爬梯 / 梯柜 / 滑梯），深 = 床宽方向；靠背一侧（深的 -y 侧）贴墙
+  {cat:'儿童床', items:[
+    ['bunkbed','上下铺（直梯）',2080,1300,'#d9c2a0'],['bunkstairs','梯柜高低床',2580,1260,'#e3d3bb'],
+    ['trundlebed','子母床（拖床）',2080,1700,'#cfdcd2'],['lbunk','错层 L 型高低床',2120,2120,'#d8c4a6'],
+    ['loftbed','高架床（下方书桌）',2080,1080,'#e9e4dc'],['slidebed','滑梯城堡床',3240,1100,'#efe6d8'],
+    ['crib','婴儿床',1250,700,'#efe3d0']]},
   {cat:'客厅', items:[
     ['sofa','三人沙发',2400,900,'#8396a8'],['sofa','双人沙发',1700,880,'#a9b6c6'],['cornersofa','转角沙发',2800,1700,'#8396a8'],
     ['armchair','单人沙发',850,850,'#d08c60'],['beanbag','懒人沙发',800,800,'#e3a46f'],['coffeetable','茶几',1300,650,'#e6dfd4'],

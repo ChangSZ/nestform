@@ -23,6 +23,33 @@ export const ln = (x1,y1,x2,y2,ex='') => `<line x1="${x1}" y1="${y1}" x2="${x2}"
 export const pa = (d,f='none',ex='') => `<path d="${d}" fill="${f}" ${ST} ${ex}/>`;
 export const DASH = 'stroke-dasharray="4 3"';
 
+/* 高低床（俯视看到的是上层床）：床垫 + 枕头 + 被子；虚线 = 下层床 / 拖床 / 床下书桌；另画爬梯、梯柜台阶、滑梯 */
+function bunkSVG(t,x,y,w,d,c){
+  const top = (bx0, bx1, by0, by1, alongY = false) => {                 // 一张床的俯视（床头在左；alongY 时床头在上）
+    const L = bx1 - bx0, D = by1 - by0;
+    let s = rc(bx0, by0, L, D, shade(c,.9), 'rx="25"') + rc(bx0+40, by0+40, L-80, D-80, '#f8fafc', 'rx="30"');
+    if (!alongY) s += rc(bx0+70, by0+D*.2, 300, D*.6, '#fff', 'rx="60"') + rc(bx0+L*.4, by0+50, L*.6-60, D-100, c, 'rx="40"') + pa(`M${bx0+L*.4+260} ${by0+50}V${by1-50}`, 'none', DASH);
+    else s += rc(bx0+L*.2, by0+70, L*.6, 300, '#fff', 'rx="60"') + rc(bx0+50, by0+D*.4, L-100, D*.6-60, c, 'rx="40"') + pa(`M${bx0+50} ${by0+D*.4+260}H${bx1-50}`, 'none', DASH);
+    return s;
+  };
+  const dash = (bx0, by0, L, D) => rc(bx0, by0, L, D, 'none', `rx="25" ${DASH}`);
+  const ladder = (lx, ly) => rc(lx-200, ly-50, 400, 50, shade(c,.75)) + [-1, 0, 1].map(k => ln(lx+k*130, ly-50, lx+k*130, ly)).join('');
+  const steps = (sx0, sx1, n) => { let s = rc(sx0, y, sx1-sx0, d, shade(c,1.08)); for (let k = 1; k < n; k++) s += ln(sx0, y+d*k/n, sx1, y+d*k/n); return s + pa(`M${(sx0+sx1)/2} ${y+d-90}V${y+90}M${(sx0+sx1)/2-60} ${y+170}L${(sx0+sx1)/2} ${y+90}L${(sx0+sx1)/2+60} ${y+170}`); };
+  switch (t){
+    case 'bunkbed': return top(x, x+w, y, y+d-60) + ladder(x+w-340, y+d);
+    case 'bunkstairs': return top(x, x+w-500, y, y+d) + steps(x+w-500, x+w, 4);
+    case 'trundlebed': { const mz = Math.min(d-300, 1250); return dash(x+140, y+d-1000, w-280, 1000) + top(x, x+w, y, y+mz) + rc(x+140, y+mz, w-280, d-mz, shade(c,.95)) + ln(x+w/2-150, y+d-40, x+w/2+150, y+d-40); }
+    case 'lbunk': { const k = Math.min(1020, d*.48); return dash(x, y, 1020, d) + top(x, x+w, y, y+k) + rc(x+1020, y+k, w-1020, 0, 'none') + ladder(x+w-400, y+k+50) + top(x, x+1020, y+k, y+d, true); }
+    case 'loftbed': return dash(x+660, y, w-720, 600) + top(x, x+w, y, y+d-60) + ladder(x+360, y+d);
+    case 'slidebed': {
+      const bx1 = x+w-1300, z0 = y+d-620, z1 = y+d-80;
+      return steps(x, x+460, 3) + top(x+460, bx1, y, y+d) + rc(bx1, z0, 1220, z1-z0, '#f3d27a', 'rx="40"') + rc(bx1, z0, 1220, 40, '#f2b8a0') + rc(bx1, z1-40, 1220, 40, '#f2b8a0')
+        + pa(`M${bx1+250} ${(z0+z1)/2}H${bx1+1000}M${bx1+900} ${(z0+z1)/2-70}L${bx1+1000} ${(z0+z1)/2}L${bx1+900} ${(z0+z1)/2+70}`);
+    }
+  }
+  return rc(x,y,w,d,c);
+}
+
 export function furnSVG(t,w,d,c,cab){
   const x = -w/2, y = -d/2, m = Math.min(w,d);
   switch (t){
@@ -36,6 +63,7 @@ export function furnSVG(t,w,d,c,cab){
       s += pa(`M${x+w-15-Math.min(420,w*.3)} ${by}L${x+w-15} ${by}L${x+w-15} ${by+Math.min(420,w*.3)}Z`, shade(c,1.12));
       return s;
     }
+    case 'bunkbed': case 'bunkstairs': case 'trundlebed': case 'lbunk': case 'loftbed': case 'slidebed': return bunkSVG(t,x,y,w,d,c);
     case 'sofa': case 'armchair': {
       const b = d*.24, a = Math.min(200,w*.13), n = t==='armchair' ? 1 : (w>2200 ? 3 : 2), cw = (w-2*a)/n, dk = shade(c,.85);
       let s = rc(x,y,w,d,dk,'rx="60"');

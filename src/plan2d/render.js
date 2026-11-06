@@ -29,7 +29,15 @@ export function renderRooms(){
     }
   });
   s = `<defs>${clips}</defs>` + s;
-  const sill = ([a,b,c,d]) => `<rect x="${a}" y="${b}" width="${c-a}" height="${d-b}" fill="#d6dce4" stroke="#a7b1bf" stroke-width="1" vector-effect="non-scaling-stroke" pointer-events="none"/>`;
+  // 门槛：普通墙厚的洞口整块画；比普通墙厚得多的（如「单开门 + 上窗下柜」里 350mm 厚的门）只在中间画 120mm 宽的门槛，两端画门套线，
+  // 免得整块灰色看起来像一截墙
+  const sill = ([a,b,c,d]) => {
+    const hz = c - a >= d - b, th = hz ? d - b : c - a, S = 'stroke="#a7b1bf" stroke-width="1" vector-effect="non-scaling-stroke" pointer-events="none"';
+    if (th <= 160) return `<rect x="${a}" y="${b}" width="${c-a}" height="${d-b}" fill="#d6dce4" ${S}/>`;
+    const m = hz ? (b + d)/2 : (a + c)/2, r = hz ? [a, m - 60, c, m + 60] : [m - 60, b, m + 60, d];
+    return `<rect x="${r[0]}" y="${r[1]}" width="${r[2]-r[0]}" height="${r[3]-r[1]}" fill="#d6dce4" ${S}/>`
+      + (hz ? `<path d="M${a} ${b}V${d}M${c} ${b}V${d}" fill="none" ${S}/>` : `<path d="M${a} ${b}H${c}M${a} ${d}H${c}" fill="none" ${S}/>`);
+  };
   P().doors.forEach((d, i) => { if (!isDem('door', i)) s += sill(d.rect); }); P().slides.forEach((d, i) => { if (!isDem('slide', i)) s += sill(d.rect); });
   $('#gRooms').innerHTML = s;
 }
@@ -65,7 +73,7 @@ export function renderOpenings(){
     if (isDem('win', i)){ s += DEM([x0,y0,x1,y1]); return; }
     const st = P().wins[i][5];
     // 整扇窗包在一个分组里：点到窗框线 / 中线也能选中
-    if (st?.low === 'cabinet'){                                       // 门 + 上窗下柜：柜体 + 中线玻璃
+    if (st?.low === 'cabinet'){                                       // 单开门 + 上窗下柜：柜体 + 中线玻璃
       s += `<g class="op" data-win="${i}"><rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="#e6dccc" stroke="#7d6a52" stroke-width="1" vector-effect="non-scaling-stroke"/>`
         + (w >= h ? `<line x1="${x0}" y1="${y0+h/2}" x2="${x1}" y2="${y0+h/2}" ${WS}/>` : `<line x1="${x0+w/2}" y1="${y0}" x2="${x0+w/2}" y2="${y1}" ${WS}/>`) + '</g>';
       return;

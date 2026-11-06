@@ -160,7 +160,7 @@ export function moveOpening(sel, delta){
   if (sel.kind === 'door'){ const d = P().doors[sel.i]; d.h[a] += delta; }
   return delta;
 }
-/** 洞口在一端靠墙、另一端接着另一个洞口（如「门 + 上窗下柜」）时：两者对调位置 */
+/** 洞口在一端靠墙、另一端接着另一个洞口（如「单开门 + 上窗下柜」）时：两者对调位置 */
 export function swapOpening(sel){
   const r = opRect(sel); if (!r) return false;
   const h = (r[2] - r[0]) >= (r[3] - r[1]), {before, after} = neighbors(sel, r, h), o = after && after.k !== 'wall' ? after : before && before.k !== 'wall' ? before : null;

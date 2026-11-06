@@ -265,7 +265,7 @@ export function buildArch(){
   P().wins.forEach((r, i) => {
     if (isDem('win', i)) return;
     const st = r[5] || {}, sill = r[4] ?? .9, head = st.head === 'ceil' || st.full ? top : Math.min(2.4, H - .2);
-    if (st.low === 'cabinet') partCabinet(r, Math.min(sill, top), i);    // 门 + 上窗下柜：双面储物柜代替窗下墙
+    if (st.low === 'cabinet') partCabinet(r, Math.min(sill, top), i);    // 单开门 + 上窗下柜：双面储物柜代替窗下墙
     else { const o = wallBox(r, 0, Math.min(sill, top)); if (o) o.userData.win = i; }
     if (top > head){ const o = wallBox(r, head, top); if (o) o.userData.win = i; }
     colliders.push([wx(r[0]), wz(r[1]), wx(r[2]), wz(r[3])]);
