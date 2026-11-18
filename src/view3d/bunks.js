@@ -5,6 +5,7 @@
  * ===================================================================== */
 import * as THREE from 'three';
 import {mat, box, rbox, rod, blob, fabric, woodM, darker, lighter} from './kit.js';
+import {bunkDims} from '../bunk.js';
 
 const RAIL = .3;                                                    // 护栏高出床垫的高度（安全要求 ≥ 0.2m）
 const QUILTS = ['#8fb3d9', '#f2b8a0', '#a8d0b0', '#f3d27a', '#c7b3e0'];
@@ -39,14 +40,15 @@ function deck(g, P, xa, xb, za, zb, y, {axis = 'x', rails = {}, quilt = QUILTS[0
 const post = (g, P, x, z, h) => g.add(rbox(.065, h, .065, P.frame, x, 0, z, .014), blob(.04, .03, .04, P.frame, x, h, z, 14));
 /** 床头 / 床尾挡板（x 方向的端板） */
 const endBoard = (g, P, x, za, zb, y0, h) => g.add(rbox(.04, h, zb - za, P.panel, x, y0, (za + zb)/2, .012));
-/** 竖直爬梯，贴在 z 处的平面上，中心 x，从地面到 top */
-function ladder(g, P, x, z, top){
-  const hw = .2;
-  [-1, 1].forEach(s => g.add(rbox(.045, top + .45, .045, P.frame, x + s*hw, 0, z, .012)));
-  for (let yy = .28; yy < top + .05; yy += .27) g.add(rod([x - hw, yy, z], [x + hw, yy, z], .017, P.accent));
+/** 爬梯，中心 x，从地面到 top，顶端贴在 z 处的平面上；zf（梯脚位置）比 z 靠外时斜放，top 以上的扶手仍竖直 */
+function ladder(g, P, x, z, top, zf = z){
+  const hw = .2, zz = yy => zf + (z - zf)*Math.min(1, yy/top);
+  if (Math.abs(zf - z) < .01) [-1, 1].forEach(s => g.add(rbox(.045, top + .45, .045, P.frame, x + s*hw, 0, z, .012)));
+  else [-1, 1].forEach(s => g.add(rod([x + s*hw, 0, zf], [x + s*hw, top, z], .024, P.frame), rbox(.045, .47, .045, P.frame, x + s*hw, top - .02, z, .012)));
+  for (let yy = .28; yy < top + .05; yy += .27) g.add(rod([x - hw, yy, zz(yy)], [x + hw, yy, zz(yy)], .017, P.accent));
 }
 /** 梯柜：沿 z 方向的台阶（前低后高），每级正面一个抽屉 */
-function stairs(g, P, xa, xb, za, zb, ytop, n){
+function stairs(g, P, xa, xb, za, zb, ytop, n){   // za = 靠墙（最高一级），zb = 正面（第一级）
   const W = xb - xa, cx = (xa + xb)/2, dz = (zb - za)/n, sh = ytop/n;
   for (let k = 0; k < n; k++){
     const z1 = zb - k*dz, z0 = z1 - dz, h = sh*(k + 1);
@@ -57,35 +59,42 @@ function stairs(g, P, xa, xb, za, zb, ytop, n){
   }
 }
 
-export function buildBunk(g, type, w, d, c, R){
+export function buildBunk(g, type, w, d, c, R, bunk){
   const P = {frame:woodM(c), rail:woodM(lighter(c, .15)), panel:mat('#f4f1ec', {roughness:.6}), front:mat(lighter(c, .35), {roughness:.55}), accent:mat(darker(c, .72), {roughness:.5})};
   const q = () => QUILTS[Math.floor(R()*QUILTS.length)];
   const X0 = -w/2, X1 = w/2, Z0 = -d/2, Z1 = d/2;
+  const S = bunkDims(type, w*1000, d*1000, bunk), uw = S.uw/1000, ul = S.ul/1000, lw = S.lw/1000, ll = S.ll/1000;   // 上 / 下床的宽、长（m）
   switch (type){
-    case 'bunkbed': {                                                  // 上下铺：两张同尺寸的床叠放，前侧直爬梯
-      const za = Z0 + .03, zb = Z1 - .07, lx = X1 - .34;
-      [[X0 + .035, za], [X1 - .035, za], [X0 + .035, zb], [X1 - .035, zb]].forEach(([x, z]) => post(g, P, x, z, 1.9));
-      [X0 + .035, X1 - .035].forEach(x => { endBoard(g, P, x, za, zb, .22, .5); endBoard(g, P, x, za, zb, 1.37, .48); });
-      deck(g, P, X0 + .06, X1 - .06, za, zb, .2, {quilt:q()});
-      deck(g, P, X0 + .06, X1 - .06, za, zb, 1.25, {quilt:q(), rails:{back:true, front:[[X0, lx - .24], [lx + .24, X1]]}});
-      ladder(g, P, lx, Z1 - .035, 1.35);
+    case 'bunkbed': {                                                  // 上下铺：两张床叠放（尺寸可不同，床头 / 背面对齐），前侧爬梯
+      const za = Z0 + .03, zu = za + uw, zl = za + lw, xu = X0 + ul, xl = X0 + ll, lx = xu - .34;
+      [[X0 + .035, za], [X1 - .035, za], [X0 + .035, zu], [X1 - .035, zu]].forEach(([x, z]) => post(g, P, x, z, 1.9));
+      endBoard(g, P, X0 + .035, za, zl, .22, .5); endBoard(g, P, X0 + .035, za, zu, 1.37, .48);
+      if (xl > X1 - .01) endBoard(g, P, xl - .035, za, zl, .22, .5); else endBoard(g, P, xl - .035, za, zl, 0, .72);        // 下床较短：床尾板落地
+      endBoard(g, P, xu - .035, za, zu, 1.37, .48);
+      if (xu < X1 - .01) [za, zu].forEach(z => g.add(rbox(w - .07, .1, .04, P.frame, 0, 1.25, z, .012)));                    // 上床较短：两根通长横梁托住
+      if (zl > zu + .01) [X0 + .035, xl - .035].forEach(x => post(g, P, x, zl, .72));                                         // 下床较宽：前侧加两根矮柱
+      deck(g, P, X0 + .06, xl - .06, za, zl, .2, {quilt:q()});
+      deck(g, P, X0 + .06, xu - .06, za, zu, 1.25, {quilt:q(), rails:{back:true, front:[[X0, lx - .24], [lx + .24, xu]]}});
+      ladder(g, P, lx, zu + .035, 1.35, Z1 - .035);                    // 下床比上床宽时梯脚落在下床前面，斜靠到上床
       break;
     }
-    case 'bunkstairs': {                                               // 梯柜高低床：一端是带抽屉的台阶
-      const sw = .5, bx = X1 - sw, za = Z0 + .03, zb = Z1 - .03;
-      [[X0 + .035, za], [bx - .035, za], [X0 + .035, zb], [bx - .035, zb]].forEach(([x, z]) => post(g, P, x, z, 1.9));
-      endBoard(g, P, X0 + .035, za, zb, .22, .5); endBoard(g, P, X0 + .035, za, zb, 1.37, .48);
-      deck(g, P, X0 + .06, bx - .06, za, zb, .2, {quilt:q()});
-      deck(g, P, X0 + .06, bx - .06, za, zb, 1.25, {quilt:q(), rails:{back:true, front:true, right:[[za, za + .35]]}});
-      stairs(g, P, bx, X1, Z0, Z1, 1.35, 4);
+    case 'bunkstairs': {                                               // 梯柜高低床：一端是带抽屉的台阶，接到上床
+      const sw = .5, bx = X1 - sw, za = Z0 + .03, zu = Z0 + uw - .03, zl = Z0 + lw - .03, xl = X0 + ll;
+      [[X0 + .035, za], [bx - .035, za], [X0 + .035, zu], [bx - .035, zu]].forEach(([x, z]) => post(g, P, x, z, 1.9));
+      endBoard(g, P, X0 + .035, za, zl, .22, .5); endBoard(g, P, X0 + .035, za, zu, 1.37, .48);
+      if (xl < bx - .01) endBoard(g, P, xl - .035, za, zl, 0, .72);                                                          // 下床较短：床尾板落地
+      if (zl > zu + .01) [X0 + .035, xl - .035].forEach(x => post(g, P, x, zl, .72));
+      deck(g, P, X0 + .06, xl - .06, za, zl, .2, {quilt:q()});
+      deck(g, P, X0 + .06, bx - .06, za, zu, 1.25, {quilt:q(), rails:{back:true, front:true, right:[[za, za + .35]]}});
+      stairs(g, P, bx, X1, Z0, Z0 + uw, 1.35, 4);
       break;
     }
     case 'trundlebed': {                                               // 子母床：上层略高的单人床 + 下方可拉出的拖床
-      const mz1 = Z0 + 1.25, tz0 = Z1 - 1.0;
+      const mz1 = Z0 + uw, tz0 = Z1 - lw;
       [X0 + .035, X1 - .035].forEach(x => endBoard(g, P, x, Z0 + .02, mz1, .0, x < 0 ? 1.05 : .8));
       deck(g, P, X0 + .06, X1 - .06, Z0 + .02, mz1, .42, {quilt:q(), rails:{back:true, front:[[X0 + .06, X0 + .9]]}});
       // 拖床：低矮床架 + 前面板（像大抽屉）+ 万向轮
-      const tx0 = X0 + .14, tx1 = X1 - .14;
+      const tx0 = -ll/2, tx1 = ll/2;
       [[tx0 + .06, tz0 + .06], [tx1 - .06, tz0 + .06], [tx0 + .06, Z1 - .06], [tx1 - .06, Z1 - .06]].forEach(([x, z]) => g.add(blob(.025, .025, .025, mat('#3a3a3a'), x, .025, z, 12)));
       g.add(rbox(tx1 - tx0, .08, Z1 - tz0, P.frame, (tx0 + tx1)/2, .05, (tz0 + Z1)/2, .012));
       g.add(rbox(tx1 - tx0 - .05, .12, Z1 - tz0 - .07, mat('#f7f5f0', {roughness:.9}), (tx0 + tx1)/2, .13, (tz0 + Z1)/2 - .02, .04));
@@ -94,15 +103,17 @@ export function buildBunk(g, type, w, d, c, R){
       break;
     }
     case 'lbunk': {                                                    // 错层 L 型：上铺靠背墙横放，下铺靠左墙竖放，上铺右下是书桌和格子柜
-      const uz1 = Z0 + 1.02, lx1 = X0 + 1.02, ly = 1.3, lad = X1 - .4;
+      const uz1 = Z0 + uw, lx1 = X0 + lw, ly = 1.3, lad = X1 - .4;
       [[X0 + .035, Z0 + .035], [X1 - .035, Z0 + .035], [X0 + .035, uz1], [X1 - .035, uz1]].forEach(([x, z]) => post(g, P, x, z, ly + .6));
       deck(g, P, X0 + .06, X1 - .06, Z0 + .03, uz1 - .03, ly, {quilt:q(), rails:{back:true, left:true, right:true, front:[[X0, lad - .24], [lad + .24, X1]]}});
       deck(g, P, X0 + .04, lx1 - .03, Z0 + .03, Z1 - .04, .2, {axis:'z', quilt:q()});
       g.add(rbox(lx1 - X0 - .04, .5, .04, P.panel, (X0 + lx1)/2, .2, Z1 - .02, .012), rbox(.04, .5, Z1 - uz1, P.panel, lx1 - .02, .2, (uz1 + Z1)/2, .012));   // 下铺床尾 / 外侧挡板
       post(g, P, X0 + .035, Z1 - .035, .78); post(g, P, lx1 - .02, Z1 - .035, .78);
       const dx0 = lx1 + .04, dx1 = X1 - .5;                             // 书桌（上铺下方）
-      g.add(rbox(dx1 - dx0, .03, .58, P.frame, (dx0 + dx1)/2, .74, Z0 + .32, .008), box(.03, .74, .55, P.panel, dx0 + .015, 0, Z0 + .3));
-      g.add(box(.4, .01, .25, mat('#e9edf2'), (dx0 + dx1)/2, .77, Z0 + .25), blob(.05, .05, .05, mat('#f3d27a'), dx1 - .15, .82, Z0 + .2, 14));
+      if (dx1 - dx0 >= .45){
+        g.add(rbox(dx1 - dx0, .03, .58, P.frame, (dx0 + dx1)/2, .74, Z0 + .32, .008), box(.03, .74, .55, P.panel, dx0 + .015, 0, Z0 + .3));
+        g.add(box(.4, .01, .25, mat('#e9edf2'), (dx0 + dx1)/2, .77, Z0 + .25), blob(.05, .05, .05, mat('#f3d27a'), dx1 - .15, .82, Z0 + .2, 14));
+      }
       const sx0 = X1 - .48, sx1 = X1 - .06, sh = (ly - .02)/4;              // 右侧格子柜
       g.add(box(sx1 - sx0, ly - .02, .02, P.panel, (sx0 + sx1)/2, 0, Z0 + .02));
       for (let k = 0; k <= 4; k++) g.add(box(sx1 - sx0, .02, .58, P.panel, (sx0 + sx1)/2, Math.min(k*sh, ly - .04), Z0 + .3));

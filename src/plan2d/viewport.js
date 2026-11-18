@@ -1,6 +1,6 @@
 import {PX_MM, $, svg, ui, view, P} from '../store.js';
 import {aabb, snapRects} from '../geom.js';
-import {renderMeasure, renderSel} from '../plan2d/render.js';
+import {renderMeasure, renderSel, renderFurn} from '../plan2d/render.js';
 
 /* ======================= 视图 ======================= */
 export function applyView(){
@@ -12,7 +12,9 @@ export function applyView(){
   $('#sbBar').style.width = nice*view.s + 'px';
   $('#sbText').textContent = nice >= 1000 ? `${nice/1000} m` : `${nice} mm`;
   renderSel(); renderMeasure();
+  const lod = Math.round(Math.log2(view.s)*4); if (lod !== furnLod){ furnLod = lod; renderFurn(); }      // 家具名称字号跟着缩放档位走
 }
+let furnLod = null;
 /** 画布上未被浮岛遮挡的区域（相对 svg 的像素坐标） */
 export function freeRect(){
   const r = svg.getBoundingClientRect(), on = el => { if (!el) return null; const b = el.getBoundingClientRect(), cs = getComputedStyle(el);

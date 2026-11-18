@@ -12,6 +12,7 @@ import {COARSE, narrow, $, state, ui, mutate, getF, ext, P} from '../store.js';
 import {area, perim, bbox, fmt, norm} from '../geom.js';
 import {select, rotateSel, deleteSel, duplicateSel, toggleWall} from '../actions.js';
 import {toast} from '../io.js';
+import {isBunk, BUNK_KEYS, bunkDims, bunkRange, setBunk} from '../bunk.js';
 import {is3D} from '../main.js';
 
 /* ======================= 右侧面板 ======================= */
@@ -27,6 +28,13 @@ export function renderPanel(){
   p.innerHTML = overviewPanel(); bindOverview();
 }
 
+/* 总览里的一节：可折叠，开合状态记在本机；折叠时标题右侧显示摘要（面积、金额…），不用展开也能看到关键数字 */
+const FOLDS = 'nestform-folds';
+const folds = (() => { try { return JSON.parse(localStorage.getItem(FOLDS)) || {}; } catch(e){ return {}; } })();
+function fold(key, title, sub, sum, body, open = false, cls = ''){
+  return `<section class="${cls}"><details class="fold" data-fold="${key}" ${(folds[key] ?? open) ? 'open' : ''}>
+    <summary><h3>${title}${sub ? ` <small>${sub}</small>` : ''}</h3>${sum ? `<b class="sum">${sum}</b>` : ''}<i class="chev"></i></summary>${body}</details></section>`;
+}
 export function overviewPanel(){
   const rows = P().rooms.map(r => {
     const st = state.rooms[r.id];
@@ -51,63 +59,64 @@ export function overviewPanel(){
   const srcs = sourcesOf(used);
   const demLen = demolishedLength();
   return `
-  <section class="plan-set"><h3>${tr('户型设置','Plan settings')}</h3>
+  ${fold('plan', tr('户型设置','Plan settings'), '', `${hM()} m · ${tr('北','N')} ${P().north || 0}°`, `
     <div class="form">
       <label>${tr('层高','Ceiling height')} (mm)<input type="number" id="pHeight" value="${P().height || 2800}" min="2200" max="4200" step="50"></label>
       <label>${tr('指北方向','North')} (°)<input type="number" id="pNorth" value="${P().north || 0}" min="0" max="359" step="15"></label>
     </div>
-    <div class="muted" style="font-size:11.5px;margin-top:6px">${tr('层高影响 3D 墙高、窗洞和墙面面积；指北方向影响指北针和「东 / 南 / 西 / 北墙」标注。','Height drives 3D walls, windows and wall areas; north drives the compass and face labels.')}</div></section>
-  <section><h3>${tr('房间面积','Room Areas')} <small>${tr('点击查看 / 更换地面','Click to view / change flooring')}</small></h3>
+    <div class="muted" style="font-size:11.5px;margin-top:6px">${tr('层高影响 3D 墙高、窗洞和墙面面积；指北方向影响指北针和「东 / 南 / 西 / 北墙」标注。','Height drives 3D walls, windows and wall areas; north drives the compass and face labels.')}</div>`)}
+  ${fold('rooms', tr('房间面积','Room Areas'), tr('点击查看 / 更换地面','Click to view / change flooring'), `${fmt(tot)} m²`, `
     <table>${rows}</table>
     <div class="total"><span>${tr('套内使用面积','Net floor area')}</span><b>${fmt(tot)} m²</b></div>
-    <div class="muted" style="font-size:11px;margin-top:4px">${P().rooms.some(r => r.counted === false) ? tr('* 飘窗不计入使用面积；面积按墙体内净尺寸计算','* Bay windows are excluded; areas use net inner wall dimensions') : tr('* 面积按墙体内净尺寸计算','* Areas use net inner wall dimensions')}</div></section>
-  <section class="budget"><h3>${tr('预算估算','Budget estimate')} <small>${tr(`市场参考价 · ${PRICE_DATE}`, `Market reference · ${PRICE_DATE}`)}</small></h3>
+    <div class="muted" style="font-size:11px;margin-top:4px">${P().rooms.some(r => r.counted === false) ? tr('* 飘窗不计入使用面积；面积按墙体内净尺寸计算','* Bay windows are excluded; areas use net inner wall dimensions') : tr('* 面积按墙体内净尺寸计算','* Areas use net inner wall dimensions')}</div>`, true)}
+  ${fold('budget', tr('预算估算','Budget estimate'), tr(`市场参考价 · ${PRICE_DATE}`, `Market reference · ${PRICE_DATE}`), fmtRange(...total), `
     <div class="total big-total"><span>${tr('合计（地面 + 墙面 + 定制柜 / 家电）','Total (floors + walls + cabinets / appliances)')}</span><b>${fmtRange(...total)}</b></div>
-    <div class="muted" style="font-size:11.5px;margin-top:6px">${tr('区间为主流品牌中档产品的市场价（低–高），材料不含人工的已叠加铺贴 / 施工费；不含水电、吊顶、拆改等基础工程。','Ranges are mid-market prices (low–high), with labor added where materials exclude it; plumbing, ceilings and demolition not included.')}</div></section>
-  <section><h3>${tr('地面','Floors')} <small>${tr('含 5% 损耗','incl. 5% waste')}</small></h3>
+    <div class="muted" style="font-size:11.5px;margin-top:6px">${tr('区间为主流品牌中档产品的市场价（低–高），材料不含人工的已叠加铺贴 / 施工费；不含水电、吊顶、拆改等基础工程。','Ranges are mid-market prices (low–high), with labor added where materials exclude it; plumbing, ceilings and demolition not included.')}</div>`, true, 'budget')}
+  ${fold('floors', tr('地面','Floors'), tr('含 5% 损耗','incl. 5% waste'), fmtRange(...B.floor), `
     <table class="cost">${matRows}</table>
-    <div class="total"><span>${tr('地面小计','Floors')}</span><b>${fmtRange(...B.floor)}</b></div></section>
-  <section><h3>${tr('墙面','Walls')} <small>${tr(`层高 ${hM()}m，未扣门窗`,`${hM()}m ceiling, openings not deducted`)}</small></h3>
+    <div class="total"><span>${tr('地面小计','Floors')}</span><b>${fmtRange(...B.floor)}</b></div>`)}
+  ${fold('walls', tr('墙面','Walls'), tr(`层高 ${hM()}m，未扣门窗`,`${hM()}m ceiling, openings not deducted`), fmtRange(...B.wall), `
     <table class="cost">${wallRows}</table>
-    <div class="total"><span>${tr('墙面小计','Walls')}</span><b>${fmtRange(...B.wall)}</b></div></section>
-  <section><h3>${tr('定制柜 · 橱柜 · 家电','Cabinets · kitchen · appliances')} <small>${tr('柜体按投影面积','cabinets by projected area')}</small></h3>
+    <div class="total"><span>${tr('墙面小计','Walls')}</span><b>${fmtRange(...B.wall)}</b></div>`)}
+  ${fold('cabs', tr('定制柜 · 橱柜 · 家电','Cabinets · kitchen · appliances'), tr('柜体按投影面积','cabinets by projected area'), fmtRange(...B.furn), `
     <table class="cost">${furnRows || `<tr><td class="muted">${tr('暂无可计价的定制柜 / 家电','No priced cabinets or appliances yet')}</td></tr>`}</table>
-    <div class="total"><span>${tr('小计','Subtotal')}</span><b>${fmtRange(...B.furn)}</b></div></section>
+    <div class="total"><span>${tr('小计','Subtotal')}</span><b>${fmtRange(...B.furn)}</b></div>`)}
   <section><details class="srcs"><summary>${tr(`价格来源（${srcs.length} 项参考）`, `Price sources (${srcs.length})`)}</summary>
     ${srcs.map(it => `<div class="src"><b>${esc(it.name_zh)}</b> <span class="muted">¥${it.low}–${it.high} / ${{m2:'m²', m2_projection:tr('m² 投影','m² proj.'), linear_m:tr('延米','lin. m'), piece:tr('件','pc')}[it.unit] || it.unit}${it.brands?.length ? ' · ' + esc(it.brands.join(' / ')) : ''}</span>
       ${it.notes ? `<div class="muted">${esc(it.notes)}</div>` : ''}<div>${(it.sources || []).slice(0, 3).map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title || s.url)}</a>`).join('')}</div></div>`).join('')}
     <div class="muted" style="margin-top:8px">${tr('完整价目与口径说明：data/prices/SOURCES.md。品牌门店常有活动价、面积门槛和增项，实际以报价为准。','Full list and caveats: data/prices/SOURCES.md. Store promotions, thresholds and extras vary — get a real quote.')}</div></details></section>
-  <section><h3>${tr('方案统计','Plan Stats')}</h3>
+  ${fold('stats', tr('方案统计','Plan Stats'), '', tr(`${state.furniture.length} 件家具`, `${state.furniture.length} items`), `
     <div class="stats"><div><small>${tr('家具数量','Furniture')}</small><span class="big">${state.furniture.length}</span></div>
       <div><small>${tr('拆除墙体','Walls removed')}</small><span class="big">${fmt(demLen,1)}</span> m</div></div>
     <div class="actions"><button class="btn" id="clearMeasure">${tr('清除测量','Clear measures')} (${state.measures.length})</button>
-      <button class="btn danger" id="clearFurn">${tr('清空布置','Clear layout')}</button></div></section>
-  ${COARSE ? tr(`<section><h3>触屏操作</h3><div class="kbd">
+      <button class="btn danger" id="clearFurn">${tr('清空布置','Clear layout')}</button></div>`)}
+  ${COARSE ? fold('touch', tr('触屏操作','Touch Controls'), '', '', tr(`<div class="kbd">
     <kbd>单指拖动</kbd><span>空白处平移画面</span><kbd>双指</kbd><span>捏合缩放、拖动平移</span>
     <kbd>素材坞</kbd><span>点一下放到画面中央，或按住向上拖到指定位置；材质拖到房间上即应用</span>
     <kbd>点家具</kbd><span>选中后拖动移动；拖顶部圆点旋转、右下方块改尺寸</span>
     <kbd>工具条</kbd><span>选中后底部可旋转 / 复制 / 删除</span>
     <kbd>测量</kbd><span>按住拖出一条线，或依次点两点</span>
     <kbd>VR 看房</kbd><span>左下摇杆移动，拖动屏幕转向，点门开关</span>
-  </div></section>`, `<section><h3>Touch Controls</h3><div class="kbd">
+  </div>`, `<div class="kbd">
     <kbd>1-finger drag</kbd><span>Pan on empty space</span><kbd>2 fingers</kbd><span>Pinch to zoom, drag to pan</span>
     <kbd>Library</kbd><span>Tap to place at center, or hold and drag right to a spot</span>
     <kbd>Tap item</kbd><span>Drag to move; top dot rotates, bottom-right square resizes</span>
     <kbd>Toolbar</kbd><span>Bottom bar can rotate / duplicate / delete</span>
     <kbd>Measure</kbd><span>Hold and drag a line, or tap two points</span>
     <kbd>VR tour</kbd><span>Joystick moves, drag to look, tap doors to open</span>
-  </div></section>`) : ''}
-  ${tr(`<section><h3>键盘快捷键</h3><div class="kbd">
+  </div>`)) : ''}
+  ${fold('keys', tr('键盘快捷键','Keyboard Shortcuts'), '', '', tr(`<div class="kbd">
     <kbd>拖拽</kbd><span>从底部素材坞拖入家具 / 材质</span><kbd>V</kbd><span>选择 / 移动</span><kbd>M</kbd><span>测量（Shift 水平/垂直）</span>
     <kbd>W / X</kbd><span>墙体：画墙、开门开窗、标记拆除（黑色承重墙不可拆）</span><kbd>R</kbd><span>旋转 90°（Shift 反向）</span><kbd>方向键</kbd><span>微调 10mm（Shift 100mm）</span>
     <kbd>⌘/Ctrl D</kbd><span>复制</span><kbd>Delete</kbd><span>删除</span><kbd>⌘/Ctrl Z</kbd><span>撤销</span><kbd>T</kbd><span>切换 2D / 3D</span><kbd>F</kbd><span>适应窗口</span><kbd>Esc</kbd><span>取消选择</span>
-  </div></section>`, `<section><h3>Keyboard Shortcuts</h3><div class="kbd">
+  </div>`, `<div class="kbd">
     <kbd>Drag</kbd><span>Drag furniture onto the plan</span><kbd>V</kbd><span>Select / move</span><kbd>M</kbd><span>Measure (Shift: horizontal/vertical)</span>
     <kbd>W / X</kbd><span>Walls: draw, cut doors / windows, demolish (black = bearing)</span><kbd>R</kbd><span>Rotate 90° (Shift reverses)</span><kbd>Arrows</kbd><span>Nudge 10mm (Shift 100mm)</span>
     <kbd>⌘/Ctrl D</kbd><span>Duplicate</span><kbd>Delete</kbd><span>Delete</span><kbd>⌘/Ctrl Z</kbd><span>Undo</span><kbd>T</kbd><span>Toggle 2D / 3D</span><kbd>F</kbd><span>Fit to window</span><kbd>Esc</kbd><span>Deselect</span>
-  </div></section>`)}`;
+  </div>`))}`;
 }
 export function bindOverview(){
+  document.querySelectorAll('#panel details.fold').forEach(d => d.ontoggle = () => { folds[d.dataset.fold] = d.open; try { localStorage.setItem(FOLDS, JSON.stringify(folds)); } catch(e){ /* 存不下就不记 */ } });
   $('#pHeight').onchange = e => { const v = Math.round(+e.target.value/10)*10; if (v >= 2000 && v <= 5000) mutate(() => P().height = v); };
   $('#pNorth').onchange = e => { const v = ((Math.round(+e.target.value) % 360) + 360) % 360; mutate(() => P().north = v); };
   document.querySelectorAll('#panel tr[data-room]').forEach(tr => tr.onclick = () => { select({kind:'room', id:tr.dataset.room}); if (is3D()) ext.View3D.flyToRoom(tr.dataset.room); });
@@ -248,6 +257,18 @@ function bindCab(f){
   const sel = $('#cDoor'); if (sel) sel.onchange = () => upd(c => c.door = sel.value);
   [['#cStack', 'stack'], ['#cSink', 'sink'], ['#cNiche', 'niche']].forEach(([id, k]) => { const el = $(id); if (el) el.onchange = () => upd(c => c[k] = el.checked); });
 }
+// 高低床：上床 / 下床各自的宽、长（改动后占地随之更新，靠墙的一角不动）
+function bunkSection(f){
+  const D = bunkDims(f.type, f.w, f.d, f.bunk), low = f.type === 'trundlebed' ? tr('拖床','Trundle') : tr('下床','Lower bed');
+  const lab = {uw:tr('上床宽 mm','Upper width mm'), ul:tr('上床长 mm','Upper length mm'), lw:low + tr('宽 mm',' width mm'), ll:low + tr('长 mm',' length mm')};
+  const s = BUNK_KEYS[f.type].map(k => { const [lo, hi] = bunkRange(f.type, k, D); return `<label>${lab[k]}<input type="number" data-bunk="${k}" value="${D[k]}" min="${lo}" max="${Math.max(lo, hi)}" step="50"></label>`; }).join('');
+  const note = {bunkbed:tr('下床比上床宽时，爬梯改为斜梯','A wider lower bed gets a slanted ladder'), bunkstairs:tr('梯柜接上床，下床不长于上床','Stairs join the upper bed; the lower bed is never longer'),
+    trundlebed:tr('拖床要能推回主床下面','The trundle must fit under the main bed'), lbunk:tr('上床横放靠背墙，下床竖放靠侧墙','Upper bed along the back wall, lower bed along the side wall')}[f.type];
+  return `<div class="pop-label" style="padding:12px 0 6px">${tr('床铺尺寸','Bed sizes')}</div><div class="form">${s}</div>${note ? `<div class="muted" style="font-size:11px;margin-top:6px">${note}</div>` : ''}`;
+}
+function bindBunk(f){
+  document.querySelectorAll('#panel [data-bunk]').forEach(el => el.onchange = () => { const v = parseFloat(el.value); if (!isNaN(v)) mutate(() => { const g = getF(f.id); if (g) setBunk(g, el.dataset.bunk, v); }); });
+}
 export function furnPanel(f){
   return `<section><h3>${tr('家具属性','Furniture')}</h3>
     <div class="form">
@@ -260,7 +281,7 @@ export function furnPanel(f){
       <label>${tr('颜色','Color')}<input type="color" id="fC" value="${f.color}"></label>
     </div>
     <div class="muted" style="margin-top:8px">${tr('占地面积','Footprint')} ${fmt(f.w*f.d/1e6)} m²</div>
-    ${f.cab ? cabSection(f) : ''}
+    ${f.cab ? cabSection(f) : ''}${isBunk(f.type) ? bunkSection(f) : ''}
     ${(p => p ? `<div class="total"><span>${tr('参考价','Reference price')}<small class="muted"> ${p.qty} ${p.unit}</small></span><b>${fmtRange(p.low, p.high)}</b></div><div class="muted" style="font-size:11px;margin-top:4px">${esc(p.note)} · ${esc(p.items.map(i => (i.brands || []).slice(0, 3).join(' / ')).filter(Boolean).join('；'))}</div>` : '')(furnPrice(f, P().height || 2800))}
     <div class="actions">
       <button class="btn" id="aRot">${tr('旋转 90°','Rotate 90°')}</button><button class="btn" id="aDup">${tr('复制','Duplicate')}</button>
@@ -271,6 +292,7 @@ export function furnPanel(f){
 }
 export function bindFurnPanel(f){
   if (f.cab) bindCab(f);
+  if (isBunk(f.type)) bindBunk(f);
   const upd = (fn) => mutate(() => { const g = getF(f.id); if (g) fn(g); });
   const num = (id, fn) => $(id).onchange = e => { const v = parseFloat(e.target.value); if (!isNaN(v)) upd(g => fn(g, v)); };
   $('#fName').onchange = e => upd(g => g.name = e.target.value.trim() || g.name);

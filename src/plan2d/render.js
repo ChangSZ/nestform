@@ -46,10 +46,13 @@ export function renderFurn(){
   const g = $('#gFurn');
   g.setAttribute('display', ui.layers.furn ? 'inline' : 'none');
   g.innerHTML = state.furniture.map(f => {
-    const fs = Math.max(80, Math.min(170, Math.min(f.w,f.d)*.2));
-    const label = Math.min(f.w,f.d) >= 380 && !NOLABEL.includes(f.type)
-      ? `<text transform="rotate(${-f.rot})" font-size="${fs}" text-anchor="middle" dominant-baseline="central" fill="#334155" opacity=".8" pointer-events="none">${esc(nm(f.name))}</text>` : '';
-    return `<g class="furn" data-fid="${f.id}" transform="translate(${f.cx} ${f.cy}) rotate(${f.rot})">${furnSVG(f.type,f.w,f.d,f.color,f.cab)}${label}</g>`;
+    // 名称字号：至少在屏幕上有 10px（随缩放变化，见 viewport.js），但不超出家具本身；放不下、或屏幕上不足 8px 就不画，免得糊成一团
+    const name = nm(f.name), chars = [...name].reduce((a, ch) => a + (ch.charCodeAt(0) > 255 ? 1 : .56), 0);
+    const r = ((f.rot % 180) + 180) % 180, flat = r < 45 || r > 135, fit = Math.min((flat ? f.w : f.d)*.9/chars, (flat ? f.d : f.w)*.6);
+    const fs = Math.max(Math.min(170, Math.min(f.w,f.d)*.2, fit), Math.min(10/view.s, fit));
+    const label = Math.min(f.w,f.d) >= 380 && !NOLABEL.includes(f.type) && fs*view.s >= 8
+      ? `<text transform="rotate(${-f.rot})" font-size="${fs.toFixed(0)}" text-anchor="middle" dominant-baseline="central" fill="#1f2a3a" stroke="#fff" stroke-opacity=".7" stroke-width="${(fs*.18).toFixed(0)}" paint-order="stroke" pointer-events="none">${esc(name)}</text>` : '';
+    return `<g class="furn" data-fid="${f.id}" transform="translate(${f.cx} ${f.cy}) rotate(${f.rot})">${furnSVG(f.type,f.w,f.d,f.color,f.cab || f.bunk)}${label}</g>`;
   }).join('');
 }
 
@@ -154,7 +157,10 @@ export function renderDims(){
     pts.forEach(p => s += horiz
       ? `<line x1="${p}" y1="${at-170}" x2="${p}" y2="${at+170}" ${LS}/><line x1="${p-80}" y1="${at+80}" x2="${p+80}" y2="${at-80}" ${TK}/>`
       : `<line x1="${at-170}" y1="${p}" x2="${at+170}" y2="${p}" ${LS}/><line x1="${at-80}" y1="${p+80}" x2="${at+80}" y2="${p-80}" ${TK}/>`);
-    segs.forEach((v,i) => { const mid = (pts[i]+pts[i+1])/2; s += horiz ? txt(mid, at-70, v) : txt(at-70, mid, v, true); });
+    segs.forEach((v,i) => {
+      const mid = (pts[i]+pts[i+1])/2, tight = String(v).length*.58*(v<400?140:200) > v*.95;      // 数字比这一段还宽（墙厚等短段）：挪到尺寸线另一侧，不和两端刻度叠在一起
+      s += horiz ? txt(mid, tight ? at+215 : at-70, v) : txt(tight ? at+215 : at-70, mid, v, true);
+    });
     return s;
   };
   const g = $('#gDims');

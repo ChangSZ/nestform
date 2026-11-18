@@ -512,7 +512,7 @@ export function buildFurniture(f){
       }
       break;
     }
-    case 'bunkbed': case 'bunkstairs': case 'trundlebed': case 'lbunk': case 'loftbed': case 'slidebed': buildBunk(g, f.type, w, d, c, R); break;
+    case 'bunkbed': case 'bunkstairs': case 'trundlebed': case 'lbunk': case 'loftbed': case 'slidebed': buildBunk(g, f.type, w, d, c, R, f.bunk); break;
     case 'crib': {
       const wm = woodM(c);
       g.add(rbox(w - .09, .12, d - .09, fabric('#ffffff'), 0, .3, 0, .04), box(w - .06, .025, d - .06, wm, 0, .28));

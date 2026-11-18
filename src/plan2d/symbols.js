@@ -1,6 +1,7 @@
 import {MATS, WALL_MATS} from '../data.js';
 import {texURL} from '../materials.js';
 import {$} from '../store.js';
+import {bunkDims} from '../bunk.js';
 
 /* ======================= 颜色 / 材质图案 ======================= */
 export function hex2rgb(h){ h = h.replace('#',''); if (h.length===3) h = h.split('').map(c=>c+c).join(''); const n = parseInt(h,16); return [(n>>16)&255,(n>>8)&255,n&255]; }
@@ -94,7 +95,8 @@ function lampSVG(t,x,y,w,d){
 }
 
 /* 高低床（俯视看到的是上层床）：床垫 + 枕头 + 被子；虚线 = 下层床 / 拖床 / 床下书桌；另画爬梯、梯柜台阶、滑梯 */
-function bunkSVG(t,x,y,w,d,c){
+function bunkSVG(t,x,y,w,d,c,p){
+  const {uw, ul, lw, ll} = bunkDims(t, w, d, p);                        // 上 / 下床的宽、长（mm）
   const top = (bx0, bx1, by0, by1, alongY = false) => {                 // 一张床的俯视（床头在左；alongY 时床头在上）
     const L = bx1 - bx0, D = by1 - by0;
     let s = rc(bx0, by0, L, D, shade(c,.9), 'rx="25"') + rc(bx0+40, by0+40, L-80, D-80, '#f8fafc', 'rx="30"');
@@ -103,13 +105,16 @@ function bunkSVG(t,x,y,w,d,c){
     return s;
   };
   const dash = (bx0, by0, L, D) => rc(bx0, by0, L, D, 'none', `rx="25" ${DASH}`);
-  const ladder = (lx, ly) => rc(lx-200, ly-50, 400, 50, shade(c,.75)) + [-1, 0, 1].map(k => ln(lx+k*130, ly-50, lx+k*130, ly)).join('');
-  const steps = (sx0, sx1, n) => { let s = rc(sx0, y, sx1-sx0, d, shade(c,1.08)); for (let k = 1; k < n; k++) s += ln(sx0, y+d*k/n, sx1, y+d*k/n); return s + pa(`M${(sx0+sx1)/2} ${y+d-90}V${y+90}M${(sx0+sx1)/2-60} ${y+170}L${(sx0+sx1)/2} ${y+90}L${(sx0+sx1)/2+60} ${y+170}`); };
+  // 爬梯：ly = 梯脚（占地前沿），len = 俯视长度（竖直梯 50；斜梯从上床前沿一直伸到梯脚，画出踏步）
+  const ladder = (lx, ly, len = 50) => rc(lx-200, ly-len, 400, len, shade(c,.75)) + (len > 60 ? [1, 2, 3, 4].map(k => ln(lx-200, ly-len*k/5, lx+200, ly-len*k/5)) : [-1, 0, 1].map(k => ln(lx+k*130, ly-50, lx+k*130, ly))).join('');
+  const steps = (sx0, sx1, n, sd = d) => { let s = rc(sx0, y, sx1-sx0, sd, shade(c,1.08)); for (let k = 1; k < n; k++) s += ln(sx0, y+sd*k/n, sx1, y+sd*k/n); return s + pa(`M${(sx0+sx1)/2} ${y+sd-90}V${y+90}M${(sx0+sx1)/2-60} ${y+170}L${(sx0+sx1)/2} ${y+90}L${(sx0+sx1)/2+60} ${y+170}`); };
+  // 上下叠放：下床有一部分露在上床外面时先画下床（实线），再画上床；上床比床架短时用虚线画出床架范围
+  const stack = (L, pad) => (ll > ul + 5 || lw > uw + 5 ? top(x, x+ll, y, y+lw+pad) : '') + (ul < L - 5 ? dash(x, y, L, uw+pad) : '') + top(x, x+ul, y, y+uw+pad);
   switch (t){
-    case 'bunkbed': return top(x, x+w, y, y+d-60) + ladder(x+w-340, y+d);
-    case 'bunkstairs': return top(x, x+w-500, y, y+d) + steps(x+w-500, x+w, 4);
-    case 'trundlebed': { const mz = Math.min(d-300, 1250); return dash(x+140, y+d-1000, w-280, 1000) + top(x, x+w, y, y+mz) + rc(x+140, y+mz, w-280, d-mz, shade(c,.95)) + ln(x+w/2-150, y+d-40, x+w/2+150, y+d-40); }
-    case 'lbunk': { const k = Math.min(1020, d*.48); return dash(x, y, 1020, d) + top(x, x+w, y, y+k) + rc(x+1020, y+k, w-1020, 0, 'none') + ladder(x+w-400, y+k+50) + top(x, x+1020, y+k, y+d, true); }
+    case 'bunkbed': return stack(w, 40) + ladder(x+ul-340, y+d, Math.max(50, d-uw-40));
+    case 'bunkstairs': return stack(ul, 0) + steps(x+ul, x+w, 4, uw);
+    case 'trundlebed': { const tx = x+(w-ll)/2; return dash(tx, y+d-lw, ll, lw) + top(x, x+w, y, y+uw) + rc(tx, y+uw, ll, d-uw, shade(c,.95)) + ln(x+w/2-150, y+d-40, x+w/2+150, y+d-40); }
+    case 'lbunk': return dash(x, y, lw, d) + top(x, x+w, y, y+uw) + ladder(x+w-400, y+uw+50) + top(x, x+lw, y+uw, y+d, true);
     case 'loftbed': return dash(x+660, y, w-720, 600) + top(x, x+w, y, y+d-60) + ladder(x+360, y+d);
     case 'slidebed': {
       const bx1 = x+w-1300, z0 = y+d-620, z1 = y+d-80;
@@ -120,7 +125,7 @@ function bunkSVG(t,x,y,w,d,c){
   return rc(x,y,w,d,c);
 }
 
-export function furnSVG(t,w,d,c,cab){
+export function furnSVG(t,w,d,c,cab){                                   // cab：定制柜 / 高低床的附加参数（f.cab 或 f.bunk）
   const x = -w/2, y = -d/2, m = Math.min(w,d);
   switch (t){
     case 'bed': {
@@ -135,7 +140,7 @@ export function furnSVG(t,w,d,c,cab){
     }
     case 'ceilround': case 'ceilsquare': case 'chandelier': case 'pendant': case 'pendant3': case 'fanlamp': case 'downlight': case 'tracklight': case 'bathheater': case 'bedpendant': case 'walllamp': case 'mirrorlight': case 'tablelamp': case 'archlamp': return lampSVG(t,x,y,w,d);
     case 'benchend': case 'stool': case 'tatami': case 'kiddesk': case 'toyshelf': case 'playtent': case 'playmat': case 'soundbar': case 'screen': case 'rocker': case 'chaise': case 'aquarium': case 'cattree': case 'petbed': case 'hood': case 'microwave': case 'trashbin': case 'smarttoilet': case 'mirrorcab': case 'towelrack': case 'mopsink': case 'shoebench': case 'coatrack': case 'fullmirror': case 'dryrack': case 'balconyset': case 'hangchair': case 'plantstand': case 'painting': case 'decomirror': case 'vase': case 'drapes': case 'rollerblind': case 'venetian': case 'robotvac': case 'dehumid': case 'freshair': case 'radiator': return decorSVG(t,x,y,w,d,c);
-    case 'bunkbed': case 'bunkstairs': case 'trundlebed': case 'lbunk': case 'loftbed': case 'slidebed': return bunkSVG(t,x,y,w,d,c);
+    case 'bunkbed': case 'bunkstairs': case 'trundlebed': case 'lbunk': case 'loftbed': case 'slidebed': return bunkSVG(t,x,y,w,d,c,cab);
     case 'sofa': case 'armchair': {
       const b = d*.24, a = Math.min(200,w*.13), n = t==='armchair' ? 1 : (w>2200 ? 3 : 2), cw = (w-2*a)/n, dk = shade(c,.85);
       let s = rc(x,y,w,d,dk,'rx="60"');
