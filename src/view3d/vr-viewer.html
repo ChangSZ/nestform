@@ -31,7 +31,7 @@ canvas:active{cursor:grabbing}
 .rooms::-webkit-scrollbar{display:none}
 .rooms button{flex:none;width:112px;border:0;padding:0;border-radius:11px;overflow:hidden;background:#1d222b;color:#d6dbe4;font:inherit;cursor:pointer;outline:2px solid transparent;transition:outline-color .2s}
 .rooms button.on{outline-color:#6b8afd}
-.rooms i{display:block;height:58px;background-size:300% 160%;background-repeat:repeat-x}
+.rooms i{display:block;height:58px;background-size:cover;background-position:center}
 .rooms span{display:block;padding:5px 8px;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rooms span em{font-style:normal;color:#8b95a6;margin-left:4px;font-family:ui-monospace,Menlo,monospace;font-size:11px}
 #hot{position:fixed;inset:0;pointer-events:none}
@@ -121,7 +121,10 @@ function loadTex(id){
   if (texCache.has(id)) return texCache.get(id);
   const pr = new Promise(res => { const img = new Image(); img.onload = () => {
     const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+    // 全景图比这台设备支持的最大贴图还大（老手机 / 平板常见上限 4096）：先缩到上限以内再上传
+    let src = img; const lim = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+    if (img.naturalWidth > lim){ src = document.createElement('canvas'); src.width = lim; src.height = Math.round(img.naturalHeight*lim/img.naturalWidth); src.getContext('2d').drawImage(img, 0, 0, src.width, src.height); }
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
     if (G2){ gl.generateMipmap(gl.TEXTURE_2D); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); }
     else { gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -134,11 +137,18 @@ function loadTex(id){
 if (G2 && !gl.getExtension('EXT_texture_filter_anisotropic')) { /* 无各向异性扩展时 texParameterf 被忽略 */ }
 
 /* ---------- 视角状态 ---------- */
-let cur = null, prev = null, tex0 = null, tex1 = null, yaw = 0, pitch = 0, fov = innerWidth >= innerHeight ? 80 : 100, mixT = 1, f0k = 1, auto = true, gyro = null, idleT = 0;
-const FOVMIN = 30, FOVMAX = 105, rad = d => d*Math.PI/180;
+let cur = null, prev = null, tex0 = null, tex1 = null, yaw = 0, pitch = 0, fov = 0, mixT = 1, f0k = 1, auto = true, gyro = null, idleT = 0;
+const FOVMIN = 30, rad = d => d*Math.PI/180, deg = r => r*180/Math.PI;
+/* 视场按画面比例定：横屏让水平视场约 92°（竖直约 55°–72°），竖屏竖直 85°。再广的话画面边缘会被明显拉长、显得离墙很近；
+   上限同理：水平不超过 110°、竖直不超过 90° */
+const arNow = () => innerWidth/innerHeight;
+const fovDef = () => arNow() >= 1 ? Math.max(55, Math.min(72, deg(2*Math.atan(Math.tan(rad(46))/arNow())))) : 85;
+const fovMax = () => Math.min(90, Math.max(fovDef(), deg(2*Math.atan(Math.tan(rad(55))/arNow()))));
+const clampFov = v => Math.max(FOVMIN, Math.min(fovMax(), v));
+fov = fovDef();
 /* 普通透视投影：直线始终是直线；fov 为竖直视场。看不全房间时换个点位，而不是靠超广角硬塞 */
 const scale = () => Math.tan(rad(fov)/2);
-function resize(){ const dpr = Math.min(devicePixelRatio || 1, 2); cv.width = innerWidth*dpr; cv.height = innerHeight*dpr; gl.viewport(0, 0, cv.width, cv.height); }
+function resize(){ fov = clampFov(fov); const dpr = Math.min(devicePixelRatio || 1, 2); cv.width = innerWidth*dpr; cv.height = innerHeight*dpr; gl.viewport(0, 0, cv.width, cv.height); }
 addEventListener('resize', resize); resize();
 
 async function go(id, viaLink){
@@ -194,8 +204,8 @@ D.nodes.forEach(n => {
 });
 D.rooms.forEach(r => {
   const n = R[r.node], cnt = D.nodes.filter(x => x.room === r.id).length;
-  const b = document.createElement('button'); b.dataset.id = r.id; const u = n.yaw0/(2*Math.PI) + .5;
-  b.innerHTML = `<i style="background-image:url(${n.img});background-position:${(3*u - .5)/2*100}% 50%">${cnt > 1 ? `<u>${cnt}</u>` : ''}</i><span>${r.name}<em>${r.area}m²</em></span>`;
+  const b = document.createElement('button'); b.dataset.id = r.id;
+  b.innerHTML = `<i style="background-image:url(${n.thumb || n.img})">${cnt > 1 ? `<u>${cnt}</u>` : ''}</i><span>${r.name}<em>${r.area}m²</em></span>`;
   b.onclick = () => { stopAuto(); if (R[cur]?.room !== r.id) go(r.node); }; $('#rooms').appendChild(b);
 });
 function placeCone(){ if (!cur) return; const r = R[cur]; cone.style.left = r.pos[0]*100 + '%'; cone.style.top = r.pos[1]*100 + '%'; cone.style.transform = `rotate(${yaw*180/Math.PI}deg)`; }
@@ -209,15 +219,15 @@ cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); ptr
 cv.addEventListener('pointermove', e => {
   if (!ptrs.has(e.pointerId)) return;
   const [px, py] = ptrs.get(e.pointerId); ptrs.set(e.pointerId, [e.clientX, e.clientY]);
-  if (ptrs.size === 2){ const [a, b] = [...ptrs.values()]; fov = Math.max(FOVMIN, Math.min(FOVMAX, fov0*pinch0/Math.max(1, Math.hypot(a[0] - b[0], a[1] - b[1])))); return; }
+  if (ptrs.size === 2){ const [a, b] = [...ptrs.values()]; fov = clampFov(fov0*pinch0/Math.max(1, Math.hypot(a[0] - b[0], a[1] - b[1]))); return; }
   if (gyro) return;
   const k = rad(fov)/innerHeight;                              // 跟手：拖动 1px ≈ 视场 1px
   yaw -= (e.clientX - px)*k; pitch = Math.max(-1.45, Math.min(1.45, pitch + (e.clientY - py)*k));
 });
 const up = e => ptrs.delete(e.pointerId); cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
 cv.addEventListener('wheel', e => { e.preventDefault(); hideTip(); const dy = e.deltaY*(e.deltaMode === 1 ? 30 : e.deltaMode === 2 ? 600 : 1);
-  fov = Math.max(FOVMIN, Math.min(FOVMAX, fov*Math.exp(Math.max(-120, Math.min(120, dy))*.0015))); }, {passive:false});
-addEventListener('keydown', e => { if (e.key === '+' || e.key === '=') fov = Math.max(FOVMIN, fov/1.12); if (e.key === '-') fov = Math.min(FOVMAX, fov*1.12); });
+  fov = clampFov(fov*Math.exp(Math.max(-120, Math.min(120, dy))*.0015)); }, {passive:false});
+addEventListener('keydown', e => { if (e.key === '+' || e.key === '=') fov = clampFov(fov/1.12); if (e.key === '-') fov = clampFov(fov*1.12); });
 const held = {};
 addEventListener('keydown', e => { held[e.key] = true; if (e.key.startsWith('Arrow')) { stopAuto(); e.preventDefault(); } });
 addEventListener('keyup', e => { held[e.key] = false; });

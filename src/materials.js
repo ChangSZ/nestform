@@ -140,3 +140,34 @@ export function texCanvas(kind){
 const urls = new Map();
 export const texURL = kind => { if (!urls.has(kind)) urls.set(kind, texCanvas(kind).toDataURL('image/jpeg', .85)); return urls.get(kind); };
 export const matInfo = kind => MATS[kind] || WALL_MATS[kind];
+
+/* ======================= 凹凸（3D 用） =======================
+ * 贴图只有颜色时，砖缝、木纹、布纹在灯光下是一张平的画。这里从同一张贴图的亮度推出两张辅助图：
+ *   - 法线贴图：暗的地方（砖缝、木纹沟）算低，按高度差求坡度 → 侧光下有起伏；
+ *   - 粗糙度贴图：缝比面更糙，釉面砖的高光在缝上断开。
+ * 起伏强度按材质类别给：文化砖最强，石材花纹只是颜色（几乎不起伏），乳胶漆只留一点颗粒。 */
+export const reliefOf = kind => /brick/.test(kind) ? 1.5 : /tile|antislip|checker|encaustic/.test(kind) ? .8 : /wood|walnut|bamboo|chevron|panel/.test(kind) ? .55
+  : /carpet|linen|microcement|terrazzo/.test(kind) ? .5 : /marble|slab/.test(kind) ? .2 : /^wp_|wallpaper/.test(kind) ? .15 : .12;
+const reliefs = new Map();
+export function reliefCanvases(kind){
+  if (reliefs.has(kind)) return reliefs.get(kind);
+  const src = texCanvas(kind), W = src.width, H = src.height, px = src.getContext('2d').getImageData(0, 0, W, H).data;
+  const lum = new Float32Array(W*H), h = new Float32Array(W*H);
+  for (let i = 0; i < W*H; i++) lum[i] = (px[i*4]*.299 + px[i*4 + 1]*.587 + px[i*4 + 2]*.114)/255;
+  const at = (a, x, y) => a[((y + H) % H)*W + (x + W) % W];                       // 贴图是平铺的：越界取对边
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){                        // 3×3 平滑，去掉单像素噪点造成的尖刺
+    let v = 0; for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) v += at(lum, x + i, y + j);
+    h[y*W + x] = v/9;
+  }
+  let mean = 0; for (let i = 0; i < W*H; i++) mean += h[i]; mean /= W*H;
+  const mk = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return c; };
+  const nc = mk(), rc = mk(), ng = nc.getContext('2d'), rg = rc.getContext('2d'), nd = ng.createImageData(W, H), rd = rg.createImageData(W, H), S = 3;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    const dx = (at(h, x + 1, y) - at(h, x - 1, y))*S, dy = (at(h, x, y + 1) - at(h, x, y - 1))*S, k = 1/Math.hypot(dx, dy, 1), o = (y*W + x)*4;
+    nd.data[o] = (-dx*k*.5 + .5)*255; nd.data[o + 1] = (dy*k*.5 + .5)*255; nd.data[o + 2] = (k*.5 + .5)*255; nd.data[o + 3] = 255;   // 画布 y 向下、贴图 v 向上，所以 y 分量取正
+    const r = 200 + Math.max(0, Math.min(55, (mean - h[y*W + x])*260));            // 比平均暗（缝 / 沟）→ 更糙
+    rd.data[o] = rd.data[o + 1] = rd.data[o + 2] = r; rd.data[o + 3] = 255;
+  }
+  ng.putImageData(nd, 0, 0); rg.putImageData(rd, 0, 0);
+  const out = {normal:nc, rough:rc}; reliefs.set(kind, out); return out;
+}

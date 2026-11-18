@@ -105,7 +105,7 @@ export function boot(){
   matchMedia('(max-width:1100px)').addEventListener('change', () => drawer(null));
   drawer(null);                                  // 恢复上次的面板收起状态
   $('#exportPng').onclick = exportPNG;
-  $('#exportVR').onclick = exportVR;
+  $('#exportVR').onclick = () => exportVR();
   $('#exportJson').onclick = () => download(tr('栖构-户型方案', 'nestform-plan') + '.json', new Blob([JSON.stringify(state, null, 2)], {type:'application/json'}));
   $('#importJson').onclick = () => $('#fileIn').click();
   $('#fileIn').onchange = e => {
@@ -160,7 +160,7 @@ function installAutomation(){
     /** 3D 模式：'orbit'（鸟瞰）| 'walk'（VR 看房）；飞到某个房间 */
     flyToRoom:id => ext.View3D?.flyToRoom(id),
     /** 导出图片（2D 平面展示图 / 3D 效果图，取决于当前视图）、VR 看房 HTML、方案 JSON */
-    exportImage:() => exportPNG(), exportVR:() => exportVR(),
+    exportImage:() => exportPNG(), exportVR:only => exportVR(only),
     exportJSON:() => JSON.stringify(state, null, 2),
     undo, redo,
     /** 可用的家具类型 / 地面材质 / 墙面材质 */

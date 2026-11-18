@@ -1,7 +1,8 @@
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import * as THREE from 'three';
 import {MATS, WALL_MATS} from '../data.js';
-import {texCanvas, matInfo} from '../materials.js';
+import {texCanvas, matInfo, reliefCanvases, reliefOf} from '../materials.js';
 // 3D 共享上下文：renderer / 环境贴图 / 公共材质在 index.js 初始化时写入
 export const K = {renderer:null, envTex:null, envK:1, glassMat:null, frameMat:null, ox:6000, oy:5300, H:2.8};
 export const FOV = 45;                              // 层高 2.8 m
@@ -29,7 +30,10 @@ function texMat(kind, roughDefault){
   const m = matInfo(kind) || MATS.tile800, t = new THREE.CanvasTexture(texCanvas(kind));
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1/m.sx, 1/m.sy);
   t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = K.renderer.capabilities.getMaxAnisotropy();
-  return texMats[kind] = new THREE.MeshStandardMaterial({map:t, roughness:m.rough ?? roughDefault});
+  const tex = (cv, srgb) => { const x = new THREE.CanvasTexture(cv); x.wrapS = x.wrapT = THREE.RepeatWrapping; x.repeat.copy(t.repeat); x.anisotropy = t.anisotropy; if (srgb) x.colorSpace = THREE.SRGBColorSpace; return x; };
+  // 法线 + 粗糙度贴图（由颜色贴图推出，见 materials.js）：粗糙度贴图的面值是 200/255，材质粗糙度相应放大，保持面的光泽不变
+  const rl = reliefCanvases(kind), k = reliefOf(kind);
+  return texMats[kind] = new THREE.MeshStandardMaterial({map:t, roughness:Math.min(1, (m.rough ?? roughDefault)*255/200), roughnessMap:tex(rl.rough), normalMap:tex(rl.normal), normalScale:new THREE.Vector2(k, k)});
 }
 export const floorMat = kind => texMat(MATS[kind] ? kind : 'tile800', .5);
 export const wallFinishMat = kind => texMat(WALL_MATS[kind] ? kind : 'paint_white', /tile|marble/.test(kind) ? .25 : .9);
@@ -131,3 +135,39 @@ export function tableLamp(g, x, y, z, s = 1){
 }
 export const plate = (g, r, x, y, z) => g.add(lathe([[0, 0], [r*.6, 0], [r*.72, .008], [r, .02]], ceramic({side:THREE.DoubleSide}), x, y, z, 32));
 
+
+/* ======================= 合并几何 ======================= */
+/** 把一件模型里材质相同的 Mesh 合并成一个（顶点先变换到模型根的局部坐标），绘制调用从几十次降到几次。
+ *  多材质 / 带子节点的 Mesh 保持原样；镜像（负缩放）的部件翻转三角形绕序，保证正面朝外。 */
+const _m = new THREE.Matrix4();
+export function compact(g){
+  g.updateMatrixWorld(true);
+  const inv = g.matrixWorld.clone().invert(), groups = new Map();
+  g.traverse(o => {
+    if (!o.isMesh || o === g || Array.isArray(o.material) || o.children.length || !o.visible) return;
+    const k = o.material.uuid + (o.castShadow ? 's' : '') + (o.receiveShadow ? 'r' : '');
+    if (!groups.has(k)) groups.set(k, []); groups.get(k).push(o);
+  });
+  for (const list of groups.values()){
+    if (list.length < 2) continue;
+    const geos = list.map(o => {
+      const src = o.geometry, geo = src.index ? src.toNonIndexed() : src.clone();
+      for (const n of Object.keys(geo.attributes)) if (n !== 'position' && n !== 'normal' && n !== 'uv') geo.deleteAttribute(n);
+      geo.morphAttributes = {};
+      if (!geo.attributes.normal) geo.computeVertexNormals();
+      if (!geo.attributes.uv) geo.setAttribute('uv', new THREE.Float32BufferAttribute(new Float32Array(geo.attributes.position.count*2), 2));
+      _m.multiplyMatrices(inv, o.matrixWorld); geo.applyMatrix4(_m);
+      if (_m.determinant() < 0) for (const at of Object.values(geo.attributes)){               // 镜像：交换每个三角形的后两个顶点
+        const a = at.array, n = at.itemSize;
+        for (let i = 0; i < at.count; i += 3) for (let c = 0; c < n; c++){ const t = a[(i + 1)*n + c]; a[(i + 1)*n + c] = a[(i + 2)*n + c]; a[(i + 2)*n + c] = t; }
+      }
+      return geo;
+    });
+    const merged = mergeGeometries(geos, false); geos.forEach(x => x.dispose());
+    if (!merged) continue;
+    const m = new THREE.Mesh(merged, list[0].material); m.castShadow = list[0].castShadow; m.receiveShadow = list[0].receiveShadow;
+    list.forEach(o => { o.removeFromParent(); o.geometry.dispose(); });
+    g.add(m);
+  }
+  return g;
+}

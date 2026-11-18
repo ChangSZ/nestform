@@ -13,10 +13,10 @@ export async function exportPNG(){
   else await X.exportPlanSheet(download);
 }
 /** 导出 VR 看房：每个房间一张 360° 全景 + 门口热点切换，打包成单个 HTML */
-export async function exportVR(){
+export async function exportVR(only){
   if (!is3D()) await setView('3d');
   if (!ext.View3D) return;
-  await ext.View3D.exportVR(download, toast);
+  await ext.View3D.exportVR(download, toast, only);
 }
 
 /* ======================= 杂项 ======================= */

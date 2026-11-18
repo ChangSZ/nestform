@@ -9,7 +9,7 @@ import {snapMove} from '../plan2d/viewport.js';
 import {wallRuns, faceMat, roomEdges} from '../faces.js';
 import {isArc, arcOutline, arcRects} from '../arcs.js';
 import {isDem} from '../demolish.js';
-import {K, wallFinishMat, FOV, wx, wz, M, matCache, mat, floorMat, box, rbox, fronts, metal} from '../view3d/kit.js';
+import {K, wallFinishMat, FOV, wx, wz, M, matCache, mat, floorMat, box, rbox, fronts, metal, compact} from '../view3d/kit.js';
 import {buildFurniture} from '../view3d/furniture.js';
 import {MAIN_LIGHTS} from '../view3d/lamps.js';
 import {pointInPoly} from '../import/rooms.js';
@@ -19,11 +19,16 @@ import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js';
 import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
 import {CSS2DRenderer, CSS2DObject} from 'three/addons/renderers/CSS2DRenderer.js';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';
+import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 export const stage = $('#stage'), host = $('#view3d');
 export const SW = () => stage.clientWidth, SH = () => stage.clientHeight;
-export const opt = {cut:99, furn:true, labels:true, night:false, mode:'orbit'};
+export const opt = {cut:99, furn:true, labels:true, night:false, ao:!COARSE, mode:'orbit', shoot:false};   // ao：环境光遮蔽（触屏设备默认关，省电）
 
 export let inited = false, active = false, raf = 0, anim = null, fly = null;
+export let composer = null, aoPass = null, skyDay = null;
 export let fillLight, renderer, labelRenderer, scene, camera, orbit, walkCtl, hemi, sun, ground, glassMat, wallMat, capMat, frameMat;
 export let archFloor, archUp, furnG, labelG, lampG, colliders = [], selKey = null, selHelper = null;
 export let sigArch = '', sigFurn = '', sigLabels = '', grow = 1, furnGrow = 1;
@@ -37,6 +42,7 @@ export function init(){
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setSize(SW(), SH());
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;      // 阴影只在场景内容变化时重算（见 invalidate），转镜头不重算
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
   host.prepend(renderer.domElement); K.renderer = renderer;
   labelRenderer = new CSS2DRenderer();
@@ -58,6 +64,7 @@ export function init(){
   walkCtl.addEventListener('unlock', () => { if (opt.mode === 'walk'){ $('#walkOverlay').style.display = 'flex'; $('#cross').style.display = 'none'; } });
 
   hemi = new THREE.HemisphereLight(0xfff8ee, 0xa9b3c0, 1.1);
+  skyDay = skyTexture();
   // 主光：中性白、近乎正上方的柔和顶光（不模拟太阳斜射，避免长阴影和偏色），只用来给家具落地阴影
   sun = new THREE.DirectionalLight(0xffffff, 1.5);
   sun.castShadow = true; sun.shadow.mapSize.setScalar(COARSE ? 2048 : 4096);   // 平板 GPU 用小一点的阴影贴图
@@ -110,7 +117,7 @@ export function init(){
     const f = getF(fdrag.id), g = groundAt(e.clientX, e.clientY); if (!f || !g) return;
     fdrag.moved = true; cv.style.cursor = 'grabbing';
     [f.cx, f.cy] = snapMove(f, g.x - fdrag.ox, g.y - fdrag.oy);
-    furnG.children.find(o => o.userData.fid === f.id)?.position.set(wx(f.cx), 0, wz(f.cy));   // 拖动中只挪模型，松手再整体同步
+    const m = furnG.children.find(o => o.userData.fid === f.id); if (m){ m.position.x = wx(f.cx); m.position.z = wz(f.cy); invalidate(); }   // 拖动中只挪模型，松手再整体同步
   });
   const endF = e => {
     if (!fdrag || e.pointerId !== fdrag.pid) return;
@@ -145,14 +152,54 @@ export function init(){
     else select(null);
   });
   new ResizeObserver(() => {
-    renderer.setSize(SW(), SH()); labelRenderer.setSize(SW(), SH());
-    camera.aspect = SW()/SH(); camera.updateProjectionMatrix();
+    renderer.setSize(SW(), SH()); labelRenderer.setSize(SW(), SH()); composer?.setSize(SW(), SH());
+    camera.aspect = SW()/SH(); camera.updateProjectionMatrix(); invalidate(false);
   }).observe(stage);
   bindUI();
 }
 
+/* ======================= 画面：天空 / 环境光遮蔽 ======================= */
+/** 白天的背景：上蓝下白的渐变天空（地平线以下与地面同色），从窗户看出去不再是一片灰 */
+function skyTexture(){
+  const c = document.createElement('canvas'); c.width = 8; c.height = 256;
+  const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256);
+  [[0, '#7fb0e6'], [.3, '#a9cbee'], [.47, '#dfeaf5'], [.5, '#eef2f6'], [.52, '#e3e8ee'], [1, '#e3e8ee']].forEach(([t, col]) => gr.addColorStop(t, col));
+  g.fillStyle = gr; g.fillRect(0, 0, 8, 256);
+  const t = new THREE.CanvasTexture(c); t.mapping = THREE.EquirectangularReflectionMapping; t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+/** 后处理链：场景 → 环境光遮蔽（墙角、家具落地处、柜体缝隙变暗，物体「落」在地上）→ 色调映射输出。首次用到时才创建 */
+function fx(){
+  if (composer) return composer;
+  composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, {type:THREE.HalfFloatType, samples:4}));
+  composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(SW(), SH());
+  composer.addPass(new RenderPass(scene, camera));
+  aoPass = new GTAOPass(scene, camera, SW(), SH(), undefined, {radius:.5, distanceExponent:1.4, thickness:1, scale:1.15, samples:16, distanceFallOff:1}, {lumaPhi:10, depthPhi:2, normalPhi:3, radius:6, rings:2, samples:16});
+  composer.addPass(aoPass); composer.addPass(new OutputPass());
+  return composer;
+}
+/** 画一帧。pr：临时像素比（高清截图用）；cam：换一台相机拍（导出全景 / 缩略图用）；ao：是否带环境光遮蔽 */
+export function draw(pr, cam = camera, ao = opt.ao){
+  if (!ao){ renderer.render(scene, cam); return; }
+  const c = fx(); c.passes[0].camera = aoPass.camera = cam;
+  if (pr) c.setPixelRatio(pr);
+  c.render();
+  if (pr) c.setPixelRatio(renderer.getPixelRatio());
+  c.passes[0].camera = aoPass.camera = camera;
+}
+/** 临时改画布尺寸拍几张（导出用）：fn 里用 draw() 画，结束后恢复 */
+export function withSize(w, h, fn){
+  const pr = renderer.getPixelRatio();
+  renderer.setPixelRatio(1); renderer.setSize(w, h, false); fx().setPixelRatio(1); composer.setSize(w, h);
+  try { return fn(); }
+  finally { renderer.setPixelRatio(pr); renderer.setSize(SW(), SH(), false); composer.setPixelRatio(pr); composer.setSize(SW(), SH()); invalidate(false); }
+}
+
 /* ======================= 建筑 ======================= */
 export function clearGroup(g){ g.traverse(o => { if (o.geometry) o.geometry.dispose(); }); g.clear(); }
+/* 按需渲染：画面只在「有东西变了」时重画。镜头移动由主循环自己比较位姿发现；
+   场景内容变化（重建、灯光、显隐、拖动家具…）调用 invalidate()，shadow = true 时连阴影一起重算 */
+let dirty = 2;
+export function invalidate(shadow = true){ dirty = 2; if (shadow && renderer) renderer.shadowMap.needsUpdate = true; }
 export function wallBox([x0, y0, x1, y1], yb, yt, m){
   if (yt - yb <= .001) return;
   const o = new THREE.Mesh(new THREE.BoxGeometry(M(x1-x0), yt-yb, M(y1-y0)), m || [wallMat, wallMat, capMat, wallMat, wallMat, wallMat]);
@@ -343,28 +390,42 @@ function buildWallSkins(top){
 const cornerMat = new THREE.LineBasicMaterial({color:0x5f5a52, transparent:true, opacity:.55});
 
 const MAX_LAMP_LIGHTS = 12;                                          // 点光源太多会拖慢渲染：超出的灯只发光不照明
-function buildFurn(){
-  clearGroup(furnG);
-  const gs = state.furniture.map(f => buildFurniture(f));
+/* 家具增量同步：每件家具按「自身数据 + 户型原点 / 层高」记一个签名，只重建变了的那几件（挪一件家具不再重建全屋）。
+   新建的模型按材质合并几何（compact），一件家具从几十个 Mesh 降到几个 */
+const furnMap = new Map();                                           // 家具 id → {sig, g, box, light}
+function dropFurn(e){ furnG.remove(e.g); e.g.traverse(o => { if (o.geometry) o.geometry.dispose(); }); }
+function buildFurn(force){
+  if (force){ furnMap.forEach(dropFurn); furnMap.clear(); }
+  const env = [K.ox, K.oy, K.H].join(), live = new Set();
+  for (const f of state.furniture){
+    const sig = env + JSON.stringify(f), cur = furnMap.get(f.id); live.add(f.id);
+    if (cur?.sig === sig) continue;
+    if (cur) dropFurn(cur);
+    const g = compact(buildFurniture(f)); if (g.userData.mount === 'ceil') g.userData.walkOnly = true;
+    furnG.add(g); furnMap.set(f.id, {sig, g, box:null, light:null});
+  }
+  for (const [id, e] of furnMap) if (!live.has(id)){ dropFurn(e); furnMap.delete(id); }
   // 台面摆件（台灯、音箱、微波炉、花瓶）：放到下方家具的台面上（向下打一条射线，取 1.25m 以下最高的水平面）
-  const ray = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0);
-  gs.forEach((g, i) => {
-    if (g.userData.mount !== 'top') return;
-    const f = state.furniture[i]; let y = 0;
-    gs.forEach((h, j) => {
-      if (j === i || h.userData.mount === 'top' || h.userData.mount === 'ceil' || h.userData.mount === 'wall') return;
-      h.updateMatrixWorld(true); ray.set(new THREE.Vector3(wx(f.cx), 1.25, wz(f.cy)), down);
-      for (const hit of ray.intersectObject(h, true)){ const n = hit.face?.normal.clone().transformDirection(hit.object.matrixWorld); if (n && n.y > .9){ y = Math.max(y, hit.point.y); break; } }
-    });
-    g.position.y = y;
-  });
+  const ray = new THREE.Raycaster(), down = new THREE.Vector3(0, -1, 0), org = new THREE.Vector3();
+  const boxOf = e => e.box ||= new THREE.Box3().setFromObject(e.g);
+  for (const f of state.furniture){
+    const e = furnMap.get(f.id); if (e.g.userData.mount !== 'top') continue;
+    let y = 0; org.set(wx(f.cx), 1.25, wz(f.cy));
+    for (const h of furnMap.values()){
+      const m = h.g.userData.mount; if (h === e || m === 'top' || m === 'ceil' || m === 'wall') continue;
+      const bx = boxOf(h); if (org.x < bx.min.x || org.x > bx.max.x || org.z < bx.min.z || org.z > bx.max.z) continue;      // 不在这件家具的占地内
+      h.g.updateMatrixWorld(true); ray.set(org, down);
+      for (const hit of ray.intersectObject(h.g, true)){ const n = hit.face?.normal.clone().transformDirection(hit.object.matrixWorld); if (n && n.y > .9){ y = Math.max(y, hit.point.y); break; } }
+    }
+    e.g.position.y = y;
+  }
   // 灯的光源：夜景时打开；主照明（吸顶 / 吊灯 / 筒灯…）优先
-  let n = 0;
-  gs.map((g, i) => [g, state.furniture[i]]).filter(([g]) => g.userData.lamp?.at).sort(([a], [b]) => b.userData.lamp.k - a.userData.lamp.k).forEach(([g]) => {
-    if (n++ >= MAX_LAMP_LIGHTS) return;
-    const L = g.userData.lamp, pl = new THREE.PointLight(0xffd9a8, 0, L.dist, 1.6); pl.position.set(...L.at); pl.userData.lampK = L.k; g.add(pl);
+  const lamps = [...furnMap.values()].filter(e => e.g.userData.lamp?.at).sort((a, b) => b.g.userData.lamp.k - a.g.userData.lamp.k);
+  lamps.forEach((e, n) => {
+    const L = e.g.userData.lamp, on = n < MAX_LAMP_LIGHTS;
+    if (on && !e.light){ e.light = new THREE.PointLight(0xffd9a8, 0, L.dist, 1.6); e.light.position.set(...L.at); e.light.userData.lampK = L.k; e.g.add(e.light); }
+    if (!on && e.light){ e.g.remove(e.light); e.light = null; }
   });
-  gs.forEach(g => { if (g.userData.mount === 'ceil') g.userData.walkOnly = true; furnG.add(g); });
   furnG.children.forEach(o => { if (o.userData.walkOnly) o.visible = opt.mode === 'walk'; });
   syncRoomLamps();
   furnG.visible = opt.furn; selKey = null; applyLight(); applyGrow();
@@ -392,31 +453,37 @@ export function sync(force){
   if (!inited || (!active && !force)) return;
   const pl = JSON.stringify(state.plan), a = pl + JSON.stringify([state.rooms, state.demolished, opt.cut]), f = pl + JSON.stringify(state.furniture), l = JSON.stringify([state.rooms, opt.cut]);
   if (force || a !== sigArch){ sigArch = a; buildArch(); syncRoomLamps(); }
-  if (force || f !== sigFurn){ sigFurn = f; buildFurn(); }
+  if (force || f !== sigFurn){ sigFurn = f; buildFurn(force); }
   if (force || l !== sigLabels){ sigLabels = l; buildLabels(); }
+  invalidate();
 }
 
 // CSS2DRenderer 只看标签自身的 visible，不继承父级，所以逐个设置
-export function showLabels(v){ labelG.visible = v; labelG.children.forEach(o => o.visible = v); }
+export function showLabels(v){ labelG.visible = v; labelG.children.forEach(o => o.visible = v); invalidate(false); }
 export function applyGrow(){
   if (!inited) return;
   archUp.scale.y = Math.max(grow, .001);
   furnG.scale.y = Math.max(furnGrow, .001);
-  lampG.visible = grow > .99;
+  lampG.visible = grow > .99; invalidate();
 }
 
 /* ======================= 日照 / 夜景 ======================= */
+const NIGHT_BG = new THREE.Color(0x0d1220);
 export function applyLight(){
   sun.position.set(2, 24, 3); sun.target.position.set(0, 0, 0);
+  const inside = opt.mode === 'walk' || opt.shoot;                  // 人在屋里（漫游 / 拍全景）：没有直射的顶光可看，环境光和补光给足，白墙才是白的
   sun.intensity = opt.night ? .05 : 1.5;
-  hemi.intensity = opt.night ? .12 : .85; fillLight.intensity = opt.night ? .04 : (opt.mode === 'walk' ? .75 : .45);
-  scene.background = new THREE.Color(opt.night ? 0x0d1220 : 0xe9edf2);
+  hemi.intensity = opt.night ? .12 : inside ? 1.12 : .85; fillLight.intensity = opt.night ? .04 : (inside ? .75 : .45);
+  // 地面色 = 朝下的面（天花、吊柜底）受到的光：白天按「地面反光」给亮一些，否则站在屋里抬头看天花是一片深灰
+  hemi.groundColor.set(opt.night ? 0xa9b3c0 : 0xe9e6df);
+  scene.background = opt.night ? NIGHT_BG : skyDay;
   ground.material.color.set(opt.night ? 0x1a2030 : 0xe3e8ee);
   // 白天把点光源整个隐藏（强度为 0 也会进着色器计算，隐藏的才会被渲染器跳过）
   lampG.children.forEach(o => { if (o.isPointLight){ o.visible = opt.night && !o.userData.off; o.intensity = 6; } else o.material.emissiveIntensity = opt.night ? 2 : .3; });
   furnG?.traverse(o => { if (o.isPointLight && o.userData.lampK){ o.visible = opt.night; o.intensity = o.userData.lampK; } });
-  renderer.toneMappingExposure = opt.night ? 1.25 : 1.05;
+  renderer.toneMappingExposure = opt.night ? 1.25 : inside ? 1.14 : 1.05;
   K.envK = opt.night ? .15 : 1; matCache.forEach(m => { if (m.envMap) m.envMapIntensity = m.userData.env*K.envK; });
+  invalidate();
 }
 
 /* ======================= 相机位姿 / 动画 ======================= */
@@ -467,7 +534,7 @@ export async function enter(){
   const A = planPose(), B = isoFrom(A);
   grow = 0; furnGrow = 0; applyGrow(); setPose(A);
   stage.classList.add('animating');
-  startLoop(); renderer.render(scene, camera);
+  startLoop(); draw();
   stage.classList.add('is3d');                       // 交叉淡入：此刻 3D 画面与 2D 平面完全重合
   await wait(420);
   await animate(1700, t => {
@@ -477,7 +544,7 @@ export async function enter(){
     applyGrow();
   });
   orbit.enabled = true; showLabels(opt.labels);
-  stage.classList.remove('animating');
+  stage.classList.remove('animating'); syncHint3d();
 }
 export async function exit(){
   if (opt.mode === 'walk'){ walkCtl.unlock(); stopTouchWalk(); $('#hint3d').textContent = HINT_ORBIT(); $('#walkOverlay').style.display = 'none'; $('#cross').style.display = 'none';
@@ -552,8 +619,9 @@ export function updateSel(){
     else if (k === 'wall') g = archUp.children.find(o => o.userData.wall === ui.sel.i);
     else if (k === 'win') g = archUp.children.find(o => o.userData.win === ui.sel.i && o.isMesh);
     if (g){ selHelper = new THREE.BoxHelper(g, k === 'furn' ? 0x4c6ef5 : 0xf76b15); scene.add(selHelper); }
+    invalidate(false);
   }
-  if (selHelper) selHelper.update();
+  if (selHelper && dirty) selHelper.update();
 }
 
 /* ======================= 漫游 ======================= */
@@ -562,7 +630,12 @@ export const HINT_ORBIT = () => COARSE ? tr('单指拖动画面 · 双指缩放 
   : tr('拖动平移 · 右键或 Shift+拖动旋转 · 滚轮缩放 · 点房间飞过去 · 选中家具后拖动摆放', 'Drag pans · right-drag or Shift+drag rotates · scroll zooms · click a room to fly there · drag selected furniture');
 export const HINT_TOUCHWALK = () => tr('左下摇杆移动 · 拖动画面转向 · 双指缩放视野 · 点门开关', 'Joystick moves · drag to look · pinch to zoom · tap doors to open');
 export const HINT_WALK = () => tr('WASD 移动 · 鼠标转向 · 滚轮缩放视野 · Shift 快走 · E 开关门 · Esc 暂停', 'WASD moves · mouse looks · scroll zooms · Shift runs · E opens doors · Esc pauses');
-export function syncHint3d(){ $('#hint3d').textContent = opt.mode === 'orbit' ? HINT_ORBIT() : touchWalk ? HINT_TOUCHWALK() : HINT_WALK(); }
+let hintTimer = 0;
+/** 操作提示：进入 3D / 换模式时出现，几秒后自动淡出，不长期挡着画面 */
+export function syncHint3d(){
+  const el = $('#hint3d'); el.textContent = opt.mode === 'orbit' ? HINT_ORBIT() : touchWalk ? HINT_TOUCHWALK() : HINT_WALK();
+  el.classList.remove('gone'); clearTimeout(hintTimer); hintTimer = setTimeout(() => el.classList.add('gone'), 7000);
+}
 export let touchWalk = false;
 export const joy = {x:0, y:0, id:null}, eul = new THREE.Euler(0, 0, 0, 'YXZ');
 export function lookBy(dx, dy){
@@ -677,33 +750,45 @@ export function bindUI(){
   $('#vIso').onclick = () => { if (opt.mode === 'walk') setMode('orbit'); else flyTo(isoWhole()); };
   $('#vTop').onclick = () => { if (opt.mode === 'walk') setMode('orbit'); flyTo(topWhole()); };
   document.querySelectorAll('[data-cut]').forEach(b => b.onclick = () => { if (opt.mode === 'walk') return; opt.cut = +b.dataset.cut; syncCutBtns(); sync(); });
+  document.querySelectorAll('#toggles3d .btn').forEach(b => b.classList.toggle('on', !!opt[b.dataset.t]));
   document.querySelectorAll('#toggles3d .btn').forEach(b => b.onclick = () => {
     const k = b.dataset.t; opt[k] = !opt[k]; b.classList.toggle('on', opt[k]);
-    if (k === 'furn'){ furnG.visible = opt.furn; if (!opt.furn && ui.sel?.kind === 'furn') select(null); }
+    if (k === 'furn'){ furnG.visible = opt.furn; invalidate(); if (!opt.furn && ui.sel?.kind === 'furn') select(null); }
     if (k === 'labels') showLabels(opt.labels && opt.mode === 'orbit' && !anim);
     if (k === 'night') applyLight();
+    if (k === 'ao') invalidate(false);
   });
 }
 
 /* ======================= 主循环 ======================= */
 export const clock = new THREE.Clock();
 export function startLoop(){ if (!raf){ clock.getDelta(); raf = requestAnimationFrame(loop); } }
+const near = (a, b) => Math.abs(a - b) < 1e-3;
+const lastCam = {p:new THREE.Vector3(), q:new THREE.Quaternion(), fov:0};
 export function loop(){
   raf = requestAnimationFrame(loop);
   const dt = Math.min(clock.getDelta(), .05), now = performance.now();
-  if (anim){ const t = clamp01((now - anim.t0)/anim.dur); anim.fn(t); if (t >= 1){ const r = anim.res; anim = null; r(); } }
+  if (anim){ const t = clamp01((now - anim.t0)/anim.dur); anim.fn(t); invalidate(); if (t >= 1){ const r = anim.res; anim = null; r(); } }
   else if (fly){ const t = clamp01((now - fly.t0)/fly.dur); camTween(fly.A, fly.B, ease(t)); if (t >= 1) fly = null; }
   else if (opt.mode === 'orbit') orbit.update();
   else stepWalk(dt);
-  doors.forEach(d => { const tg = d.open ? d.a1 : d.a0; d.cur += (tg - d.cur) * Math.min(1, dt*6); d.pivot.rotation.y = d.cur; });
-  curtains3d.forEach(c => { c.cur += ((c.open ? 1 : 0) - c.cur)*Math.min(1, dt*4); c.cloth.scale.x = 1 - c.cur*.8; });   // 帘子收拢到一侧
+  // 门 / 帘子 / 推拉门：只在开合过程中更新
+  doors.forEach(d => { const tg = d.open ? d.a1 : d.a0; if (near(d.cur, tg)) return; d.cur += (tg - d.cur) * Math.min(1, dt*6); d.pivot.rotation.y = d.cur; invalidate(); });
+  curtains3d.forEach(c => { const tg = c.open ? 1 : 0; if (near(c.cur, tg)) return; c.cur += (tg - c.cur)*Math.min(1, dt*4); c.cloth.scale.x = 1 - c.cur*.8; invalidate(); });   // 帘子收拢到一侧
   slides3d.forEach(sl => {                                              // 推拉门：第二扇沿轨道滑到第一扇后面
-    sl.cur += ((sl.open ? 1 : 0) - sl.cur) * Math.min(1, dt*5);
+    const tg = sl.open ? 1 : 0; if (near(sl.cur, tg)) return;
+    sl.cur += (tg - sl.cur) * Math.min(1, dt*5); invalidate();
     const g = sl.panels[1], [bx, bz] = g.userData.base, off = -sl.travel*sl.cur;
     g.position.set(sl.v ? bx : bx + off, 0, sl.v ? bz + off : bz);
   });
-  updateSel(); updateCompass();
-  renderer.render(scene, camera);
+  updateSel();
+  if (!lastCam.p.equals(camera.position) || !lastCam.q.equals(camera.quaternion) || lastCam.fov !== camera.fov){   // 镜头动了
+    lastCam.p.copy(camera.position); lastCam.q.copy(camera.quaternion); lastCam.fov = camera.fov; dirty = Math.max(dirty, 1);
+  }
+  if (!dirty) return;                                                   // 画面没变：这一帧什么都不画
+  dirty--;
+  updateCompass();
+  draw();
   labelRenderer.render(scene, camera);
 }
 
@@ -722,10 +807,10 @@ function updateCompass(){
 export function capture(width = 2880){
   const pr = renderer.getPixelRatio(), hv = selHelper?.visible;
   if (selHelper) selHelper.visible = false;
-  renderer.setPixelRatio(width/SW()); renderer.render(scene, camera);
+  renderer.setPixelRatio(width/SW()); draw(width/SW());
   const src = renderer.domElement, cv = document.createElement('canvas'); cv.width = src.width; cv.height = src.height;
   cv.getContext('2d').drawImage(src, 0, 0);
-  renderer.setPixelRatio(pr); if (selHelper) selHelper.visible = hv; renderer.render(scene, camera);
+  renderer.setPixelRatio(pr); if (selHelper) selHelper.visible = hv; draw(); invalidate(false);
   const labels = [];
   if (opt.labels && opt.mode === 'orbit') P().rooms.filter(r => r.at).forEach(r => {
     const v = new THREE.Vector3(wx(r.at[0]), Math.min(opt.cut, ceilH()) + .15, wz(r.at[1])).project(camera);
