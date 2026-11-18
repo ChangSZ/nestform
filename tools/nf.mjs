@@ -181,6 +181,8 @@ const C = {
     const solid = s.furniture.filter(f => !['plant', 'baycushion'].includes(f.type) && !MOUNT[f.type]);   // 吊顶 / 壁装 / 台面摆件 / 平铺的地毯不算占地
     for (let i = 0; i < solid.length; i++) for (let j = i + 1; j < solid.length; j++){
       const a = box(solid[i]), b = box(solid[j]), ov = Math.min(a[2], b[2]) - Math.max(a[0], b[0]), oh = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
+      const onTop = (u, v) => ['ksink', 'stove'].includes(u.type) && v.type === 'counter';       // 水槽 / 灶台本来就嵌在台面上
+      if (onTop(solid[i], solid[j]) || onTop(solid[j], solid[i])) continue;
       if (ov > 50 && oh > 50) issues.push(`家具「${solid[i].name}」和「${solid[j].name}」重叠 ${ov}×${oh}mm`);
     }
     for (const d of pl.doors){ const sw = [Math.min(d.h[0], d.h[0] + (d.c[0] + d.o[0])*d.len), Math.min(d.h[1], d.h[1] + (d.c[1] + d.o[1])*d.len), Math.max(d.h[0], d.h[0] + (d.c[0] + d.o[0])*d.len), Math.max(d.h[1], d.h[1] + (d.c[1] + d.o[1])*d.len)];
